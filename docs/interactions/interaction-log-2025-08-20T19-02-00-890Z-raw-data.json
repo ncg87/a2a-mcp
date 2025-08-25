@@ -1,0 +1,885 @@
+{
+  "session": {
+    "id": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4",
+    "prompt": "Create an AI-powered cryptocurrency trading bot that analyzes market trends, makes automated trades, and sends alerts to Slack",
+    "analysis": {
+      "complexity": 8,
+      "requiredCapabilities": [
+        "financial-analysis",
+        "ai-inference",
+        "automation",
+        "messaging"
+      ],
+      "estimatedTime": 240000,
+      "taskType": "automation"
+    },
+    "startTime": "2025-08-20T19:02:00.772Z",
+    "endTime": "2025-08-20T19:02:00.889Z",
+    "status": "partial-success",
+    "statistics": {
+      "duration": 117,
+      "durationFormatted": "0s",
+      "agentCount": 5,
+      "interactionCount": 5,
+      "mcpConnectionCount": 4,
+      "protocolEventCount": 2,
+      "decisionCount": 3,
+      "successfulMCPConnections": 3,
+      "failedMCPConnections": 1,
+      "agentTypes": [
+        "ai-analysis",
+        "finance",
+        "automation",
+        "communication",
+        "coordinator"
+      ],
+      "protocolsUsed": [
+        "A2A",
+        "ACP"
+      ],
+      "totalMessages": 5,
+      "totalErrors": 1
+    }
+  },
+  "agents": {
+    "ai-analysis-agent-001": {
+      "id": "ai-analysis-agent-001",
+      "type": "ai-analysis",
+      "capabilities": [
+        "machine-learning",
+        "pattern-recognition",
+        "data-analysis"
+      ],
+      "mcpServers": [
+        "openai-mcp",
+        "huggingface-mcp"
+      ],
+      "createdAt": "2025-08-20T19:02:00.774Z",
+      "status": "created",
+      "messagesSent": 1,
+      "messagesReceived": 1,
+      "tasksCompleted": 0,
+      "errors": []
+    },
+    "finance-agent-002": {
+      "id": "finance-agent-002",
+      "type": "finance",
+      "capabilities": [
+        "market-analysis",
+        "trading-algorithms",
+        "risk-assessment"
+      ],
+      "mcpServers": [
+        "alpha-vantage-mcp"
+      ],
+      "createdAt": "2025-08-20T19:02:00.775Z",
+      "status": "created",
+      "messagesSent": 1,
+      "messagesReceived": 2,
+      "tasksCompleted": 0,
+      "errors": []
+    },
+    "automation-agent-003": {
+      "id": "automation-agent-003",
+      "type": "automation",
+      "capabilities": [
+        "task-scheduling",
+        "decision-making",
+        "execution"
+      ],
+      "mcpServers": [
+        "github-mcp"
+      ],
+      "createdAt": "2025-08-20T19:02:00.775Z",
+      "status": "created",
+      "messagesSent": 1,
+      "messagesReceived": 1,
+      "tasksCompleted": 1,
+      "errors": []
+    },
+    "communication-agent-004": {
+      "id": "communication-agent-004",
+      "type": "communication",
+      "capabilities": [
+        "messaging",
+        "alerts",
+        "notifications"
+      ],
+      "mcpServers": [
+        "slack-mcp",
+        "discord-mcp"
+      ],
+      "createdAt": "2025-08-20T19:02:00.776Z",
+      "status": "created",
+      "messagesSent": 0,
+      "messagesReceived": 1,
+      "tasksCompleted": 0,
+      "errors": [
+        {
+          "id": "c9645f72-6e0b-49e7-ace4-5822996a45b4",
+          "agentId": "communication-agent-004",
+          "taskType": "slack-notification",
+          "result": null,
+          "success": false,
+          "error": {},
+          "timestamp": "2025-08-20T19:02:00.886Z"
+        }
+      ]
+    },
+    "coordinator-agent-005": {
+      "id": "coordinator-agent-005",
+      "type": "coordinator",
+      "capabilities": [
+        "orchestration",
+        "task-management",
+        "monitoring"
+      ],
+      "mcpServers": [],
+      "createdAt": "2025-08-20T19:02:00.776Z",
+      "status": "created",
+      "messagesSent": 2,
+      "messagesReceived": 0,
+      "tasksCompleted": 0,
+      "errors": []
+    }
+  },
+  "interactions": [
+    {
+      "id": "3b933735-d848-4d3f-8116-5fc034b2e65a",
+      "fromAgent": "coordinator-agent-005",
+      "toAgent": "ai-analysis-agent-001",
+      "messageType": "task-assignment",
+      "content": {
+        "task": "analyze-market-trends",
+        "parameters": {
+          "symbols": [
+            "BTC",
+            "ETH",
+            "ADA"
+          ],
+          "timeframe": "1h"
+        }
+      },
+      "protocol": "A2A",
+      "timestamp": "2025-08-20T19:02:00.779Z",
+      "processed": false,
+      "response": null
+    },
+    {
+      "id": "2c67b1b7-61c2-4c6e-944e-0dc593b09c3f",
+      "fromAgent": "coordinator-agent-005",
+      "toAgent": "finance-agent-002",
+      "messageType": "task-assignment",
+      "content": {
+        "task": "setup-trading-parameters",
+        "parameters": {
+          "riskLevel": "medium",
+          "maxPositionSize": 0.05
+        }
+      },
+      "protocol": "A2A",
+      "timestamp": "2025-08-20T19:02:00.779Z",
+      "processed": false,
+      "response": null
+    },
+    {
+      "id": "180be192-d7de-4f52-9e23-e0cebc6b0e27",
+      "fromAgent": "ai-analysis-agent-001",
+      "toAgent": "finance-agent-002",
+      "messageType": "analysis-result",
+      "content": {
+        "trends": {
+          "BTC": "bullish",
+          "ETH": "neutral",
+          "ADA": "bearish"
+        },
+        "confidence": {
+          "BTC": 0.85,
+          "ETH": 0.6,
+          "ADA": 0.78
+        },
+        "recommendation": "buy-btc"
+      },
+      "protocol": "ACP",
+      "timestamp": "2025-08-20T19:02:00.883Z",
+      "processed": false,
+      "response": null
+    },
+    {
+      "id": "c30b0514-413b-49c5-b479-b2f50089bc83",
+      "fromAgent": "finance-agent-002",
+      "toAgent": "automation-agent-003",
+      "messageType": "trade-order",
+      "content": {
+        "action": "buy",
+        "symbol": "BTC",
+        "amount": 0.05,
+        "orderType": "market",
+        "timestamp": "2025-08-20T19:02:00.885Z"
+      },
+      "protocol": "ACP",
+      "timestamp": "2025-08-20T19:02:00.885Z",
+      "processed": false,
+      "response": null
+    },
+    {
+      "id": "4182c99e-ca80-4536-b991-61c2da090895",
+      "fromAgent": "automation-agent-003",
+      "toAgent": "communication-agent-004",
+      "messageType": "alert-notification",
+      "content": {
+        "type": "trade-executed",
+        "details": "BTC buy order executed at $43,250",
+        "urgency": "normal"
+      },
+      "protocol": "A2A",
+      "timestamp": "2025-08-20T19:02:00.886Z",
+      "processed": false,
+      "response": null
+    }
+  ],
+  "mcpConnections": [
+    {
+      "serverId": "openai-mcp",
+      "serverName": "OpenAI MCP Server",
+      "serverType": "ai-service",
+      "category": "ai",
+      "tools": [
+        "generate-text",
+        "generate-code",
+        "analyze-text",
+        "create-embedding",
+        "moderate-content"
+      ],
+      "capabilities": [
+        "text-generation",
+        "code-generation",
+        "analysis"
+      ],
+      "connectionTime": "2025-08-20T19:02:00.777Z",
+      "status": "connected",
+      "error": null,
+      "responseTime": 245
+    },
+    {
+      "serverId": "alpha-vantage-mcp",
+      "serverName": "Alpha Vantage Financial MCP",
+      "serverType": "financial-data",
+      "category": "finance",
+      "tools": [
+        "get-stock-price",
+        "get-forex-rate",
+        "get-crypto-price",
+        "technical-indicators",
+        "company-overview"
+      ],
+      "capabilities": [
+        "market-data",
+        "financial-analysis"
+      ],
+      "connectionTime": "2025-08-20T19:02:00.777Z",
+      "status": "connected",
+      "error": null,
+      "responseTime": 156
+    },
+    {
+      "serverId": "slack-mcp",
+      "serverName": "Slack MCP Server",
+      "serverType": "communication",
+      "category": "communication",
+      "tools": [
+        "send-message",
+        "create-channel",
+        "manage-users",
+        "upload-file",
+        "schedule-message",
+        "get-conversations"
+      ],
+      "capabilities": [
+        "messaging",
+        "team-collaboration"
+      ],
+      "connectionTime": "2025-08-20T19:02:00.778Z",
+      "status": "failed",
+      "error": "Authentication failed - missing SLACK_BOT_TOKEN",
+      "responseTime": null
+    },
+    {
+      "serverId": "github-mcp",
+      "serverName": "GitHub MCP Server",
+      "serverType": "version-control",
+      "category": "development",
+      "tools": [
+        "create-repository",
+        "commit-code",
+        "create-pull-request",
+        "manage-issues",
+        "search-code",
+        "get-user-info",
+        "manage-webhooks"
+      ],
+      "capabilities": [
+        "version-control",
+        "collaboration",
+        "project-management"
+      ],
+      "connectionTime": "2025-08-20T19:02:00.778Z",
+      "status": "connected",
+      "error": null,
+      "responseTime": 189
+    }
+  ],
+  "protocolEvents": [
+    {
+      "id": "68dd9116-e06e-4f90-bd35-684bf2b2ed99",
+      "protocol": "A2A",
+      "eventType": "negotiation",
+      "participants": [
+        "coordinator-agent-005",
+        "ai-analysis-agent-001"
+      ],
+      "data": {
+        "topic": "task-priority",
+        "outcome": "agreed",
+        "priority": "high"
+      },
+      "timestamp": "2025-08-20T19:02:00.888Z"
+    },
+    {
+      "id": "78e7443e-cc7a-4a0d-8ddd-c906e365fee9",
+      "protocol": "ACP",
+      "eventType": "performative",
+      "participants": [
+        "ai-analysis-agent-001",
+        "finance-agent-002"
+      ],
+      "data": {
+        "performative": "inform",
+        "content": "market-analysis-complete",
+        "ontology": "trading-domain"
+      },
+      "timestamp": "2025-08-20T19:02:00.888Z"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "6fff3c46-604e-47af-a9ab-ee5e6a999dc9",
+      "agentId": "finance-agent-002",
+      "decisionType": "trading-decision",
+      "context": "Received AI analysis indicating BTC bullish trend with 85% confidence",
+      "options": [
+        "buy-btc",
+        "hold-position",
+        "buy-eth"
+      ],
+      "chosen": "buy-btc",
+      "reasoning": "High confidence bullish signal for BTC with favorable risk/reward ratio",
+      "timestamp": "2025-08-20T19:02:00.884Z",
+      "confidence": null
+    },
+    {
+      "id": "218b0cfd-aa49-479f-a305-7442f1cdee9f",
+      "agentId": "coordinator-agent-005",
+      "decisionType": "error-handling",
+      "context": "Slack notification failed due to authentication error",
+      "options": [
+        "retry-slack",
+        "use-discord",
+        "log-only"
+      ],
+      "chosen": "use-discord",
+      "reasoning": "Discord MCP connection available as fallback for notifications",
+      "timestamp": "2025-08-20T19:02:00.889Z",
+      "confidence": null
+    },
+    {
+      "id": "0c97cfaf-07da-4304-8a8a-f94085a41299",
+      "agentId": "automation-agent-003",
+      "decisionType": "monitoring-frequency",
+      "context": "System operating normally after successful trade execution",
+      "options": [
+        "1-minute",
+        "5-minute",
+        "15-minute"
+      ],
+      "chosen": "5-minute",
+      "reasoning": "Balanced frequency for monitoring without excessive API calls",
+      "timestamp": "2025-08-20T19:02:00.889Z",
+      "confidence": null
+    }
+  ],
+  "events": [
+    {
+      "type": "agent-creation",
+      "data": {
+        "agentId": "ai-analysis-agent-001",
+        "type": "ai-analysis",
+        "capabilities": [
+          "machine-learning",
+          "pattern-recognition",
+          "data-analysis"
+        ],
+        "timestamp": "2025-08-20T19:02:00.774Z"
+      },
+      "timestamp": "2025-08-20T19:02:00.774Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-creation",
+      "data": {
+        "agentId": "finance-agent-002",
+        "type": "finance",
+        "capabilities": [
+          "market-analysis",
+          "trading-algorithms",
+          "risk-assessment"
+        ],
+        "timestamp": "2025-08-20T19:02:00.775Z"
+      },
+      "timestamp": "2025-08-20T19:02:00.775Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-creation",
+      "data": {
+        "agentId": "automation-agent-003",
+        "type": "automation",
+        "capabilities": [
+          "task-scheduling",
+          "decision-making",
+          "execution"
+        ],
+        "timestamp": "2025-08-20T19:02:00.775Z"
+      },
+      "timestamp": "2025-08-20T19:02:00.775Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-creation",
+      "data": {
+        "agentId": "communication-agent-004",
+        "type": "communication",
+        "capabilities": [
+          "messaging",
+          "alerts",
+          "notifications"
+        ],
+        "timestamp": "2025-08-20T19:02:00.776Z"
+      },
+      "timestamp": "2025-08-20T19:02:00.776Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-creation",
+      "data": {
+        "agentId": "coordinator-agent-005",
+        "type": "coordinator",
+        "capabilities": [
+          "orchestration",
+          "task-management",
+          "monitoring"
+        ],
+        "timestamp": "2025-08-20T19:02:00.776Z"
+      },
+      "timestamp": "2025-08-20T19:02:00.776Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "mcp-connection",
+      "data": {
+        "serverId": "openai-mcp",
+        "serverName": "OpenAI MCP Server",
+        "serverType": "ai-service",
+        "category": "ai",
+        "tools": [
+          "generate-text",
+          "generate-code",
+          "analyze-text",
+          "create-embedding",
+          "moderate-content"
+        ],
+        "capabilities": [
+          "text-generation",
+          "code-generation",
+          "analysis"
+        ],
+        "connectionTime": "2025-08-20T19:02:00.777Z",
+        "status": "connected",
+        "error": null,
+        "responseTime": 245
+      },
+      "timestamp": "2025-08-20T19:02:00.777Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "mcp-connection",
+      "data": {
+        "serverId": "alpha-vantage-mcp",
+        "serverName": "Alpha Vantage Financial MCP",
+        "serverType": "financial-data",
+        "category": "finance",
+        "tools": [
+          "get-stock-price",
+          "get-forex-rate",
+          "get-crypto-price",
+          "technical-indicators",
+          "company-overview"
+        ],
+        "capabilities": [
+          "market-data",
+          "financial-analysis"
+        ],
+        "connectionTime": "2025-08-20T19:02:00.777Z",
+        "status": "connected",
+        "error": null,
+        "responseTime": 156
+      },
+      "timestamp": "2025-08-20T19:02:00.777Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "mcp-connection",
+      "data": {
+        "serverId": "slack-mcp",
+        "serverName": "Slack MCP Server",
+        "serverType": "communication",
+        "category": "communication",
+        "tools": [
+          "send-message",
+          "create-channel",
+          "manage-users",
+          "upload-file",
+          "schedule-message",
+          "get-conversations"
+        ],
+        "capabilities": [
+          "messaging",
+          "team-collaboration"
+        ],
+        "connectionTime": "2025-08-20T19:02:00.778Z",
+        "status": "failed",
+        "error": "Authentication failed - missing SLACK_BOT_TOKEN",
+        "responseTime": null
+      },
+      "timestamp": "2025-08-20T19:02:00.778Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "mcp-connection",
+      "data": {
+        "serverId": "github-mcp",
+        "serverName": "GitHub MCP Server",
+        "serverType": "version-control",
+        "category": "development",
+        "tools": [
+          "create-repository",
+          "commit-code",
+          "create-pull-request",
+          "manage-issues",
+          "search-code",
+          "get-user-info",
+          "manage-webhooks"
+        ],
+        "capabilities": [
+          "version-control",
+          "collaboration",
+          "project-management"
+        ],
+        "connectionTime": "2025-08-20T19:02:00.778Z",
+        "status": "connected",
+        "error": null,
+        "responseTime": 189
+      },
+      "timestamp": "2025-08-20T19:02:00.778Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-interaction",
+      "data": {
+        "id": "3b933735-d848-4d3f-8116-5fc034b2e65a",
+        "fromAgent": "coordinator-agent-005",
+        "toAgent": "ai-analysis-agent-001",
+        "messageType": "task-assignment",
+        "content": {
+          "task": "analyze-market-trends",
+          "parameters": {
+            "symbols": [
+              "BTC",
+              "ETH",
+              "ADA"
+            ],
+            "timeframe": "1h"
+          }
+        },
+        "protocol": "A2A",
+        "timestamp": "2025-08-20T19:02:00.779Z",
+        "processed": false,
+        "response": null
+      },
+      "timestamp": "2025-08-20T19:02:00.779Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-interaction",
+      "data": {
+        "id": "2c67b1b7-61c2-4c6e-944e-0dc593b09c3f",
+        "fromAgent": "coordinator-agent-005",
+        "toAgent": "finance-agent-002",
+        "messageType": "task-assignment",
+        "content": {
+          "task": "setup-trading-parameters",
+          "parameters": {
+            "riskLevel": "medium",
+            "maxPositionSize": 0.05
+          }
+        },
+        "protocol": "A2A",
+        "timestamp": "2025-08-20T19:02:00.779Z",
+        "processed": false,
+        "response": null
+      },
+      "timestamp": "2025-08-20T19:02:00.779Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-interaction",
+      "data": {
+        "id": "180be192-d7de-4f52-9e23-e0cebc6b0e27",
+        "fromAgent": "ai-analysis-agent-001",
+        "toAgent": "finance-agent-002",
+        "messageType": "analysis-result",
+        "content": {
+          "trends": {
+            "BTC": "bullish",
+            "ETH": "neutral",
+            "ADA": "bearish"
+          },
+          "confidence": {
+            "BTC": 0.85,
+            "ETH": 0.6,
+            "ADA": 0.78
+          },
+          "recommendation": "buy-btc"
+        },
+        "protocol": "ACP",
+        "timestamp": "2025-08-20T19:02:00.883Z",
+        "processed": false,
+        "response": null
+      },
+      "timestamp": "2025-08-20T19:02:00.883Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-decision",
+      "data": {
+        "id": "6fff3c46-604e-47af-a9ab-ee5e6a999dc9",
+        "agentId": "finance-agent-002",
+        "decisionType": "trading-decision",
+        "context": "Received AI analysis indicating BTC bullish trend with 85% confidence",
+        "options": [
+          "buy-btc",
+          "hold-position",
+          "buy-eth"
+        ],
+        "chosen": "buy-btc",
+        "reasoning": "High confidence bullish signal for BTC with favorable risk/reward ratio",
+        "timestamp": "2025-08-20T19:02:00.884Z",
+        "confidence": null
+      },
+      "timestamp": "2025-08-20T19:02:00.884Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-interaction",
+      "data": {
+        "id": "c30b0514-413b-49c5-b479-b2f50089bc83",
+        "fromAgent": "finance-agent-002",
+        "toAgent": "automation-agent-003",
+        "messageType": "trade-order",
+        "content": {
+          "action": "buy",
+          "symbol": "BTC",
+          "amount": 0.05,
+          "orderType": "market",
+          "timestamp": "2025-08-20T19:02:00.885Z"
+        },
+        "protocol": "ACP",
+        "timestamp": "2025-08-20T19:02:00.885Z",
+        "processed": false,
+        "response": null
+      },
+      "timestamp": "2025-08-20T19:02:00.885Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "task-result",
+      "data": {
+        "id": "3dd32e3c-6509-4c91-abd6-902bf2be387c",
+        "agentId": "automation-agent-003",
+        "taskType": "trade-execution",
+        "result": {
+          "orderId": "ORD-001",
+          "status": "filled",
+          "price": 43250
+        },
+        "success": true,
+        "error": null,
+        "timestamp": "2025-08-20T19:02:00.885Z"
+      },
+      "timestamp": "2025-08-20T19:02:00.885Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-interaction",
+      "data": {
+        "id": "4182c99e-ca80-4536-b991-61c2da090895",
+        "fromAgent": "automation-agent-003",
+        "toAgent": "communication-agent-004",
+        "messageType": "alert-notification",
+        "content": {
+          "type": "trade-executed",
+          "details": "BTC buy order executed at $43,250",
+          "urgency": "normal"
+        },
+        "protocol": "A2A",
+        "timestamp": "2025-08-20T19:02:00.886Z",
+        "processed": false,
+        "response": null
+      },
+      "timestamp": "2025-08-20T19:02:00.886Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "task-result",
+      "data": {
+        "id": "c9645f72-6e0b-49e7-ace4-5822996a45b4",
+        "agentId": "communication-agent-004",
+        "taskType": "slack-notification",
+        "result": null,
+        "success": false,
+        "error": {},
+        "timestamp": "2025-08-20T19:02:00.886Z"
+      },
+      "timestamp": "2025-08-20T19:02:00.887Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "protocol-event",
+      "data": {
+        "id": "68dd9116-e06e-4f90-bd35-684bf2b2ed99",
+        "protocol": "A2A",
+        "eventType": "negotiation",
+        "participants": [
+          "coordinator-agent-005",
+          "ai-analysis-agent-001"
+        ],
+        "data": {
+          "topic": "task-priority",
+          "outcome": "agreed",
+          "priority": "high"
+        },
+        "timestamp": "2025-08-20T19:02:00.888Z"
+      },
+      "timestamp": "2025-08-20T19:02:00.888Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "protocol-event",
+      "data": {
+        "id": "78e7443e-cc7a-4a0d-8ddd-c906e365fee9",
+        "protocol": "ACP",
+        "eventType": "performative",
+        "participants": [
+          "ai-analysis-agent-001",
+          "finance-agent-002"
+        ],
+        "data": {
+          "performative": "inform",
+          "content": "market-analysis-complete",
+          "ontology": "trading-domain"
+        },
+        "timestamp": "2025-08-20T19:02:00.888Z"
+      },
+      "timestamp": "2025-08-20T19:02:00.888Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-decision",
+      "data": {
+        "id": "218b0cfd-aa49-479f-a305-7442f1cdee9f",
+        "agentId": "coordinator-agent-005",
+        "decisionType": "error-handling",
+        "context": "Slack notification failed due to authentication error",
+        "options": [
+          "retry-slack",
+          "use-discord",
+          "log-only"
+        ],
+        "chosen": "use-discord",
+        "reasoning": "Discord MCP connection available as fallback for notifications",
+        "timestamp": "2025-08-20T19:02:00.889Z",
+        "confidence": null
+      },
+      "timestamp": "2025-08-20T19:02:00.889Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    },
+    {
+      "type": "agent-decision",
+      "data": {
+        "id": "0c97cfaf-07da-4304-8a8a-f94085a41299",
+        "agentId": "automation-agent-003",
+        "decisionType": "monitoring-frequency",
+        "context": "System operating normally after successful trade execution",
+        "options": [
+          "1-minute",
+          "5-minute",
+          "15-minute"
+        ],
+        "chosen": "5-minute",
+        "reasoning": "Balanced frequency for monitoring without excessive API calls",
+        "timestamp": "2025-08-20T19:02:00.889Z",
+        "confidence": null
+      },
+      "timestamp": "2025-08-20T19:02:00.889Z",
+      "sessionId": "92f04001-f4f3-4ed5-a5bb-d3a7e6dc9ca4"
+    }
+  ],
+  "results": {
+    "steps": [
+      {
+        "step": "Agent system initialization",
+        "error": null
+      },
+      {
+        "step": "MCP server connections",
+        "error": null
+      },
+      {
+        "step": "Market analysis execution",
+        "error": null
+      },
+      {
+        "step": "Trading decision made",
+        "error": null
+      },
+      {
+        "step": "Trade executed successfully",
+        "error": null
+      },
+      {
+        "step": "Slack notification",
+        "error": "Authentication failed"
+      },
+      {
+        "step": "Fallback to Discord",
+        "error": null
+      }
+    ],
+    "overallStatus": "partial-success",
+    "executedTrades": 1,
+    "failedNotifications": 1,
+    "activeAgents": 5,
+    "mcpConnectionsActive": 3,
+    "mcpConnectionsFailed": 1
+  }
+}

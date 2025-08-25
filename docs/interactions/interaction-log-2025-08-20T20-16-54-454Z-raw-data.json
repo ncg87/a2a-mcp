@@ -1,0 +1,59 @@
+{
+  "session": {
+    "id": "7bb5aac5-8391-4664-a39c-1d6a65835752",
+    "prompt": "WHat is quantative finance and where exactly should I be looking for money?",
+    "analysis": {
+      "complexity": 2,
+      "taskType": "general",
+      "capabilities": [
+        "general-purpose"
+      ],
+      "estimatedAgents": 2
+    },
+    "startTime": "2025-08-20T20:15:15.569Z",
+    "endTime": "2025-08-20T20:16:54.454Z",
+    "status": "success",
+    "statistics": {
+      "duration": 98885,
+      "durationFormatted": "1m 38s",
+      "agentCount": 0,
+      "interactionCount": 0,
+      "mcpConnectionCount": 0,
+      "protocolEventCount": 0,
+      "decisionCount": 0,
+      "successfulMCPConnections": 0,
+      "failedMCPConnections": 0,
+      "agentTypes": [],
+      "protocolsUsed": [],
+      "totalMessages": 0,
+      "totalErrors": 0
+    }
+  },
+  "agents": {},
+  "interactions": [],
+  "mcpConnections": [],
+  "protocolEvents": [],
+  "decisions": [],
+  "events": [],
+  "results": {
+    "steps": [
+      {
+        "step": "Prompt analysis",
+        "error": null
+      },
+      {
+        "step": "Agent creation",
+        "error": null
+      },
+      {
+        "step": "MCP server discovery",
+        "error": null
+      },
+      {
+        "step": "Extended conversation",
+        "error": null
+      }
+    ],
+    "overallStatus": "success"
+  }
+}

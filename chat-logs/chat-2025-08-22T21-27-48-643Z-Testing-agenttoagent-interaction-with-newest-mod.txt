@@ -1,0 +1,40 @@
+CHAT LOG - 2025-08-22T21:27:48.644Z
+Session ID: test-interaction-1755898068643
+=============================================================
+
+USER PROMPT:
+Testing agent-to-agent interaction with newest models and MCP tools
+
+=============================================================
+AGENT RESPONSES:
+
+
+[2025-08-22T21:27:48.645Z] SYSTEM TEST:
+Starting MESH pattern interaction test
+
+-----------------------------------------------------------
+
+[2025-08-22T21:27:48.647Z] SYSTEM ERROR:
+Mesh pattern error: Cannot read properties of undefined (reading 'generateResponse')
+
+-----------------------------------------------------------
+
+[2025-08-22T21:27:48.648Z] SYSTEM TEST:
+Starting DEBATE pattern interaction test
+
+-----------------------------------------------------------
+
+[2025-08-22T21:27:48.649Z] SYSTEM ERROR:
+Debate pattern error: interactionManager.facilitateDebate is not a function
+
+-----------------------------------------------------------
+
+[2025-08-22T21:27:48.650Z] SYSTEM TEST:
+Starting SOCRATIC pattern interaction test
+
+-----------------------------------------------------------
+
+[2025-08-22T21:27:48.651Z] SYSTEM ERROR:
+Socratic pattern error: interactionManager.facilitateSocraticDialogue is not a function
+
+-----------------------------------------------------------

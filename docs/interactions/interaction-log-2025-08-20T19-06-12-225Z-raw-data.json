@@ -1,0 +1,119 @@
+{
+  "session": {
+    "id": "84f3c141-2cea-46af-9c49-a7e35feeaf79",
+    "prompt": "Write a Python web scraper that extracts data from multiple e-commerce sites and stores it in a database",
+    "analysis": {
+      "complexity": 9,
+      "taskType": "code-generation",
+      "requiredCapabilities": [
+        "text-generation",
+        "analysis"
+      ]
+    },
+    "startTime": "2025-08-20T19:06:12.224Z",
+    "endTime": "2025-08-20T19:06:12.225Z",
+    "status": "success",
+    "statistics": {
+      "duration": 1,
+      "durationFormatted": "0s",
+      "agentCount": 1,
+      "interactionCount": 0,
+      "mcpConnectionCount": 0,
+      "protocolEventCount": 0,
+      "decisionCount": 0,
+      "successfulMCPConnections": 0,
+      "failedMCPConnections": 0,
+      "agentTypes": [
+        "code-generation"
+      ],
+      "protocolsUsed": [],
+      "totalMessages": 0,
+      "totalErrors": 0
+    }
+  },
+  "agents": {
+    "code-generation-agent-1755716772224": {
+      "id": "code-generation-agent-1755716772224",
+      "type": "code-generation",
+      "capabilities": [
+        "ai-reasoning",
+        "task-execution"
+      ],
+      "mcpServers": [
+        "openai-mcp"
+      ],
+      "createdAt": "2025-08-20T19:06:12.224Z",
+      "status": "created",
+      "messagesSent": 0,
+      "messagesReceived": 0,
+      "tasksCompleted": 1,
+      "errors": []
+    }
+  },
+  "interactions": [],
+  "mcpConnections": [],
+  "protocolEvents": [],
+  "decisions": [],
+  "events": [
+    {
+      "type": "optimal-model-selection",
+      "data": {
+        "taskType": "code-generation",
+        "selectedModel": "openai-gpt-4",
+        "modelName": "OpenAI GPT-4",
+        "reasoning": "Optimal for code-generation tasks"
+      },
+      "timestamp": "2025-08-20T19:06:12.224Z",
+      "sessionId": "84f3c141-2cea-46af-9c49-a7e35feeaf79"
+    },
+    {
+      "type": "agent-creation",
+      "data": {
+        "agentId": "code-generation-agent-1755716772224",
+        "type": "code-generation",
+        "capabilities": [
+          "ai-reasoning",
+          "task-execution"
+        ],
+        "timestamp": "2025-08-20T19:06:12.224Z"
+      },
+      "timestamp": "2025-08-20T19:06:12.224Z",
+      "sessionId": "84f3c141-2cea-46af-9c49-a7e35feeaf79"
+    },
+    {
+      "type": "task-result",
+      "data": {
+        "id": "69ea25d5-835c-4bdb-b9f3-ad8a4f04b9a9",
+        "agentId": "code-generation-agent-1755716772224",
+        "taskType": "task-processing",
+        "result": {
+          "status": "completed",
+          "model": "OpenAI GPT-4"
+        },
+        "success": true,
+        "error": null,
+        "timestamp": "2025-08-20T19:06:12.224Z"
+      },
+      "timestamp": "2025-08-20T19:06:12.224Z",
+      "sessionId": "84f3c141-2cea-46af-9c49-a7e35feeaf79"
+    }
+  ],
+  "results": {
+    "steps": [
+      {
+        "step": "Model selection",
+        "error": null
+      },
+      {
+        "step": "Agent creation",
+        "error": null
+      },
+      {
+        "step": "Task processing",
+        "error": null
+      }
+    ],
+    "overallStatus": "success",
+    "modelUsed": "OpenAI GPT-4"
+  }
+}

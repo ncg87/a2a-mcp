@@ -1,0 +1,119 @@
+{
+  "session": {
+    "id": "df9f66ba-88f1-40d1-ad9e-2901e4fbbe8f",
+    "prompt": "Build a sophisticated AI-powered trading algorithm that uses deep learning to analyze market patterns and make automated investment decisions",
+    "analysis": {
+      "complexity": 8,
+      "taskType": "reasoning",
+      "requiredCapabilities": [
+        "text-generation",
+        "analysis"
+      ]
+    },
+    "startTime": "2025-08-20T19:06:12.198Z",
+    "endTime": "2025-08-20T19:06:12.201Z",
+    "status": "success",
+    "statistics": {
+      "duration": 3,
+      "durationFormatted": "0s",
+      "agentCount": 1,
+      "interactionCount": 0,
+      "mcpConnectionCount": 0,
+      "protocolEventCount": 0,
+      "decisionCount": 0,
+      "successfulMCPConnections": 0,
+      "failedMCPConnections": 0,
+      "agentTypes": [
+        "reasoning"
+      ],
+      "protocolsUsed": [],
+      "totalMessages": 0,
+      "totalErrors": 0
+    }
+  },
+  "agents": {
+    "reasoning-agent-1755716772200": {
+      "id": "reasoning-agent-1755716772200",
+      "type": "reasoning",
+      "capabilities": [
+        "ai-reasoning",
+        "task-execution"
+      ],
+      "mcpServers": [
+        "openai-mcp"
+      ],
+      "createdAt": "2025-08-20T19:06:12.200Z",
+      "status": "created",
+      "messagesSent": 0,
+      "messagesReceived": 0,
+      "tasksCompleted": 1,
+      "errors": []
+    }
+  },
+  "interactions": [],
+  "mcpConnections": [],
+  "protocolEvents": [],
+  "decisions": [],
+  "events": [
+    {
+      "type": "optimal-model-selection",
+      "data": {
+        "taskType": "reasoning",
+        "selectedModel": "anthropic-claude-3-opus",
+        "modelName": "Anthropic Claude 3 Opus",
+        "reasoning": "Optimal for reasoning tasks"
+      },
+      "timestamp": "2025-08-20T19:06:12.199Z",
+      "sessionId": "df9f66ba-88f1-40d1-ad9e-2901e4fbbe8f"
+    },
+    {
+      "type": "agent-creation",
+      "data": {
+        "agentId": "reasoning-agent-1755716772200",
+        "type": "reasoning",
+        "capabilities": [
+          "ai-reasoning",
+          "task-execution"
+        ],
+        "timestamp": "2025-08-20T19:06:12.200Z"
+      },
+      "timestamp": "2025-08-20T19:06:12.200Z",
+      "sessionId": "df9f66ba-88f1-40d1-ad9e-2901e4fbbe8f"
+    },
+    {
+      "type": "task-result",
+      "data": {
+        "id": "8ae3fb36-16d9-4b02-80e1-77e3a161a4f0",
+        "agentId": "reasoning-agent-1755716772200",
+        "taskType": "task-processing",
+        "result": {
+          "status": "completed",
+          "model": "Anthropic Claude 3 Opus"
+        },
+        "success": true,
+        "error": null,
+        "timestamp": "2025-08-20T19:06:12.200Z"
+      },
+      "timestamp": "2025-08-20T19:06:12.200Z",
+      "sessionId": "df9f66ba-88f1-40d1-ad9e-2901e4fbbe8f"
+    }
+  ],
+  "results": {
+    "steps": [
+      {
+        "step": "Model selection",
+        "error": null
+      },
+      {
+        "step": "Agent creation",
+        "error": null
+      },
+      {
+        "step": "Task processing",
+        "error": null
+      }
+    ],
+    "overallStatus": "success",
+    "modelUsed": "Anthropic Claude 3 Opus"
+  }
+}

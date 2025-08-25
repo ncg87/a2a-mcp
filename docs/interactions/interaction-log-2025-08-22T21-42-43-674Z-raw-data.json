@@ -1,0 +1,57 @@
+{
+  "session": {
+    "id": "91bf0ae9-6bc8-475b-83de-0cec4f01d20a",
+    "prompt": "FInd some statistical correlation between different markets for me find two different markets research it and then decide what I should do to find correlations and possible strategies that can be implemented based on research paper and different sources and market data.",
+    "analysis": {
+      "complexity": 10,
+      "taskType": "autonomous",
+      "models": 16,
+      "agents": 6
+    },
+    "startTime": "2025-08-22T20:56:43.133Z",
+    "endTime": "2025-08-22T21:42:43.673Z",
+    "status": "success",
+    "statistics": {
+      "duration": 2760540,
+      "durationFormatted": "46m 0s",
+      "agentCount": 0,
+      "interactionCount": 0,
+      "mcpConnectionCount": 0,
+      "protocolEventCount": 0,
+      "decisionCount": 0,
+      "successfulMCPConnections": 0,
+      "failedMCPConnections": 0,
+      "agentTypes": [],
+      "protocolsUsed": [],
+      "totalMessages": 0,
+      "totalErrors": 0
+    }
+  },
+  "agents": {},
+  "interactions": [],
+  "mcpConnections": [],
+  "protocolEvents": [],
+  "decisions": [],
+  "events": [],
+  "results": {
+    "steps": [
+      {
+        "step": "Multi-model analysis",
+        "error": null
+      },
+      {
+        "step": "Dynamic agent creation",
+        "error": null
+      },
+      {
+        "step": "Autonomous conversation",
+        "error": null
+      },
+      {
+        "step": "Multi-model consensus conclusion",
+        "error": null
+      }
+    ],
+    "overallStatus": "success"
+  }
+}

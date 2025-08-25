@@ -1,0 +1,119 @@
+{
+  "session": {
+    "id": "a1395ef7-8810-4234-bfca-f670af5ff2c3",
+    "prompt": "Translate this simple sentence to Spanish",
+    "analysis": {
+      "complexity": 6,
+      "taskType": "cost-sensitive",
+      "requiredCapabilities": [
+        "text-generation",
+        "analysis"
+      ]
+    },
+    "startTime": "2025-08-20T19:06:12.251Z",
+    "endTime": "2025-08-20T19:06:12.252Z",
+    "status": "success",
+    "statistics": {
+      "duration": 1,
+      "durationFormatted": "0s",
+      "agentCount": 1,
+      "interactionCount": 0,
+      "mcpConnectionCount": 0,
+      "protocolEventCount": 0,
+      "decisionCount": 0,
+      "successfulMCPConnections": 0,
+      "failedMCPConnections": 0,
+      "agentTypes": [
+        "cost-sensitive"
+      ],
+      "protocolsUsed": [],
+      "totalMessages": 0,
+      "totalErrors": 0
+    }
+  },
+  "agents": {
+    "cost-sensitive-agent-1755716772251": {
+      "id": "cost-sensitive-agent-1755716772251",
+      "type": "cost-sensitive",
+      "capabilities": [
+        "ai-reasoning",
+        "task-execution"
+      ],
+      "mcpServers": [
+        "openai-mcp"
+      ],
+      "createdAt": "2025-08-20T19:06:12.251Z",
+      "status": "created",
+      "messagesSent": 0,
+      "messagesReceived": 0,
+      "tasksCompleted": 1,
+      "errors": []
+    }
+  },
+  "interactions": [],
+  "mcpConnections": [],
+  "protocolEvents": [],
+  "decisions": [],
+  "events": [
+    {
+      "type": "optimal-model-selection",
+      "data": {
+        "taskType": "cost-sensitive",
+        "selectedModel": "anthropic-claude-3-haiku",
+        "modelName": "Anthropic Claude 3 Haiku",
+        "reasoning": "Optimal for cost-sensitive tasks"
+      },
+      "timestamp": "2025-08-20T19:06:12.251Z",
+      "sessionId": "a1395ef7-8810-4234-bfca-f670af5ff2c3"
+    },
+    {
+      "type": "agent-creation",
+      "data": {
+        "agentId": "cost-sensitive-agent-1755716772251",
+        "type": "cost-sensitive",
+        "capabilities": [
+          "ai-reasoning",
+          "task-execution"
+        ],
+        "timestamp": "2025-08-20T19:06:12.251Z"
+      },
+      "timestamp": "2025-08-20T19:06:12.252Z",
+      "sessionId": "a1395ef7-8810-4234-bfca-f670af5ff2c3"
+    },
+    {
+      "type": "task-result",
+      "data": {
+        "id": "a1ba534c-861d-49e9-9093-940310517b1e",
+        "agentId": "cost-sensitive-agent-1755716772251",
+        "taskType": "task-processing",
+        "result": {
+          "status": "completed",
+          "model": "Anthropic Claude 3 Haiku"
+        },
+        "success": true,
+        "error": null,
+        "timestamp": "2025-08-20T19:06:12.252Z"
+      },
+      "timestamp": "2025-08-20T19:06:12.252Z",
+      "sessionId": "a1395ef7-8810-4234-bfca-f670af5ff2c3"
+    }
+  ],
+  "results": {
+    "steps": [
+      {
+        "step": "Model selection",
+        "error": null
+      },
+      {
+        "step": "Agent creation",
+        "error": null
+      },
+      {
+        "step": "Task processing",
+        "error": null
+      }
+    ],
+    "overallStatus": "success",
+    "modelUsed": "Anthropic Claude 3 Haiku"
+  }
+}

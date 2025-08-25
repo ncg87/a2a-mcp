@@ -1,0 +1,55 @@
+{
+  "session": {
+    "id": "56042d20-0a3f-4fd7-b3c5-9d2762648d2a",
+    "prompt": "Create a comprehensive DeFi ecosystem with AMM, yield farming across multiple chains (Ethereum, Polygon, Arbitrum), governance token with quadratic voting, flash loan prevention, automated arbitrage bots, regulatory compliance for 50+ countries, quantum-resistant security, AI-based market manipulation detection, mobile app with institutional security, and CBDC integration for traditional banking partnerships.",
+    "analysis": {
+      "complexity": 10,
+      "taskType": "defi-ecosystem"
+    },
+    "startTime": "2025-08-20T20:02:14.340Z",
+    "endTime": "2025-08-20T20:02:17.352Z",
+    "status": "success",
+    "statistics": {
+      "duration": 3012,
+      "durationFormatted": "3s",
+      "agentCount": 0,
+      "interactionCount": 0,
+      "mcpConnectionCount": 0,
+      "protocolEventCount": 0,
+      "decisionCount": 0,
+      "successfulMCPConnections": 0,
+      "failedMCPConnections": 0,
+      "agentTypes": [],
+      "protocolsUsed": [],
+      "totalMessages": 0,
+      "totalErrors": 0
+    }
+  },
+  "agents": {},
+  "interactions": [],
+  "mcpConnections": [],
+  "protocolEvents": [],
+  "decisions": [],
+  "events": [],
+  "results": {
+    "steps": [
+      {
+        "step": "Agent creation",
+        "error": null
+      },
+      {
+        "step": "Extended conversation",
+        "error": null
+      },
+      {
+        "step": "Decision making",
+        "error": null
+      },
+      {
+        "step": "Analysis complete",
+        "error": null
+      }
+    ],
+    "overallStatus": "success"
+  }
+}

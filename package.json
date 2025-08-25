@@ -1,0 +1,103 @@
+{
+  "name": "multi-agent-mcp-ensemble",
+  "version": "1.0.0",
+  "description": "A distributed multi-agent system with MCP server integration, A2A and ACP protocols",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "press-play": "node src/press-play.js",
+    "play": "node src/working-press-play.js",
+    "auto": "node src/autonomous-press-play.js",
+    "start:coordinator": "node src/agents/coordinator.js",
+    "start:coordinator-enhanced": "node src/agents/coordinator-enhanced.js",
+    "start:code-agent": "node src/agents/specialists/code-agent.js",
+    "start:research-agent": "node src/agents/specialists/research-agent.js",
+    "start:analysis-agent": "node src/agents/specialists/analysis-agent.js",
+    "start:testing-agent": "node src/agents/specialists/testing-agent.js",
+    "start:devops-agent": "node src/agents/specialists/devops-agent.js",
+    "start:file-agent": "node src/agents/workers/file-agent.js",
+    "start:database-agent": "node src/agents/workers/database-agent.js",
+    "start:api-agent": "node src/agents/workers/api-agent.js",
+    "start:security-agent": "node src/agents/workers/security-agent.js",
+    "start:agent-factory": "node src/agents/specialists/agent-factory.js",
+    "start:all": "node src/ensemble-launcher.js",
+    "demo": "node examples/meta-task-demo.js",
+    "demo:create-agents": "node examples/create-agents-task.js",
+    "test": "jest",
+    "test:verification": "node test-knowledge-verification.js",
+    "test:subagents": "node test-sub-agent-system.js",
+    "test:api": "node test-api-fixes.js",
+    "lint": "eslint src/**/*.js",
+    "dev": "nodemon src/press-play.js",
+    "quick": "npm run press-play",
+    "research": "node start-continuous-research.js",
+    "research:24-7": "node start-continuous-research.js"
+  },
+  "dependencies": {
+    "axios": "^1.5.0",
+    "commander": "^11.0.0",
+    "dotenv": "^16.3.1",
+    "eventemitter3": "^5.0.1",
+    "express": "^4.18.2",
+    "js-yaml": "^4.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^5.7.0",
+    "node-cron": "^3.0.2",
+    "nodemailer": "^6.10.1",
+    "pg": "^8.11.3",
+    "redis": "^4.6.8",
+    "uuid": "^9.0.1",
+    "winston": "^3.10.0",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "chai": "^4.5.0",
+    "eslint": "^8.49.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1"
+  },
+  "jest": {
+    "preset": "es-modules",
+    "extensionsToTreatAsEsm": [
+      ".js"
+    ],
+    "globals": {
+      "ts-jest": {
+        "useESM": true
+      }
+    },
+    "moduleNameMapping": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
+    "transform": {}
+  },
+  "keywords": [
+    "multi-agent",
+    "mcp",
+    "ai",
+    "distributed-systems",
+    "ensemble",
+    "a2a-protocol",
+    "acp-protocol",
+    "auto-orchestrator",
+    "press-play"
+  ],
+  "bin": {
+    "press-play": "./src/press-play.js",
+    "multi-agent": "./src/index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Multi-Agent Ensemble Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/multi-agent/mcp-ensemble.git"
+  },
+  "bugs": {
+    "url": "https://github.com/multi-agent/mcp-ensemble/issues"
+  },
+  "homepage": "https://github.com/multi-agent/mcp-ensemble#readme"
+}

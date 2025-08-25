@@ -1,0 +1,164 @@
+{
+  "session": {
+    "id": "b320a130-26e6-46bc-9e8e-a1116d114634",
+    "prompt": "Create a complex prompt",
+    "analysis": {
+      "complexity": 1,
+      "requiredCapabilities": [
+        "general-purpose"
+      ],
+      "estimatedTime": 30000,
+      "taskType": "general"
+    },
+    "startTime": "2025-08-20T19:40:29.571Z",
+    "endTime": "2025-08-20T19:40:31.296Z",
+    "status": "success",
+    "statistics": {
+      "duration": 1725,
+      "durationFormatted": "1s",
+      "agentCount": 3,
+      "interactionCount": 0,
+      "mcpConnectionCount": 0,
+      "protocolEventCount": 0,
+      "decisionCount": 0,
+      "successfulMCPConnections": 0,
+      "failedMCPConnections": 0,
+      "agentTypes": [
+        "coordinator",
+        "code",
+        "data-science"
+      ],
+      "protocolsUsed": [],
+      "totalMessages": 0,
+      "totalErrors": 0
+    }
+  },
+  "agents": {
+    "coordinator-agent-1755718829585-0": {
+      "id": "coordinator-agent-1755718829585-0",
+      "type": "coordinator",
+      "capabilities": [
+        "orchestration",
+        "task-management",
+        "coordination",
+        "project-planning"
+      ],
+      "mcpServers": [],
+      "createdAt": "2025-08-20T19:40:29.585Z",
+      "status": "created",
+      "messagesSent": 0,
+      "messagesReceived": 0,
+      "tasksCompleted": 0,
+      "errors": []
+    },
+    "code-agent-1755718829587-1": {
+      "id": "code-agent-1755718829587-1",
+      "type": "code",
+      "capabilities": [
+        "programming",
+        "debugging",
+        "code-review",
+        "software-architecture"
+      ],
+      "mcpServers": [],
+      "createdAt": "2025-08-20T19:40:29.587Z",
+      "status": "created",
+      "messagesSent": 0,
+      "messagesReceived": 0,
+      "tasksCompleted": 0,
+      "errors": []
+    },
+    "data-science-agent-1755718829589-2": {
+      "id": "data-science-agent-1755718829589-2",
+      "type": "data-science",
+      "capabilities": [
+        "data-analysis",
+        "machine-learning",
+        "statistics",
+        "data-visualization"
+      ],
+      "mcpServers": [],
+      "createdAt": "2025-08-20T19:40:29.589Z",
+      "status": "created",
+      "messagesSent": 0,
+      "messagesReceived": 0,
+      "tasksCompleted": 0,
+      "errors": []
+    }
+  },
+  "interactions": [],
+  "mcpConnections": [],
+  "protocolEvents": [],
+  "decisions": [],
+  "events": [
+    {
+      "type": "agent-creation",
+      "data": {
+        "agentId": "coordinator-agent-1755718829585-0",
+        "type": "coordinator",
+        "capabilities": [
+          "orchestration",
+          "task-management",
+          "coordination",
+          "project-planning"
+        ],
+        "timestamp": "2025-08-20T19:40:29.585Z"
+      },
+      "timestamp": "2025-08-20T19:40:29.585Z",
+      "sessionId": "b320a130-26e6-46bc-9e8e-a1116d114634"
+    },
+    {
+      "type": "agent-creation",
+      "data": {
+        "agentId": "code-agent-1755718829587-1",
+        "type": "code",
+        "capabilities": [
+          "programming",
+          "debugging",
+          "code-review",
+          "software-architecture"
+        ],
+        "timestamp": "2025-08-20T19:40:29.587Z"
+      },
+      "timestamp": "2025-08-20T19:40:29.587Z",
+      "sessionId": "b320a130-26e6-46bc-9e8e-a1116d114634"
+    },
+    {
+      "type": "agent-creation",
+      "data": {
+        "agentId": "data-science-agent-1755718829589-2",
+        "type": "data-science",
+        "capabilities": [
+          "data-analysis",
+          "machine-learning",
+          "statistics",
+          "data-visualization"
+        ],
+        "timestamp": "2025-08-20T19:40:29.589Z"
+      },
+      "timestamp": "2025-08-20T19:40:29.589Z",
+      "sessionId": "b320a130-26e6-46bc-9e8e-a1116d114634"
+    }
+  ],
+  "results": {
+    "steps": [
+      {
+        "step": "Agent creation",
+        "error": null
+      },
+      {
+        "step": "MCP server connections",
+        "error": null
+      },
+      {
+        "step": "Protocol initialization",
+        "error": null
+      },
+      {
+        "step": "Task analysis complete",
+        "error": null
+      }
+    ],
+    "overallStatus": "success"
+  }
+}

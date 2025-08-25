@@ -1,0 +1,57 @@
+{
+  "session": {
+    "id": "f3ef3850-b55c-4a6d-87ed-9fa4118bdf5e",
+    "prompt": "How is the S&P 500 going to look in the next year and how is it related to 6 7. This is crucial information about a propierty quantatative strategy.",
+    "analysis": {
+      "complexity": 10,
+      "taskType": "autonomous",
+      "models": 16,
+      "agents": 6
+    },
+    "startTime": "2025-08-21T15:35:46.836Z",
+    "endTime": "2025-08-21T16:35:11.036Z",
+    "status": "success",
+    "statistics": {
+      "duration": 3564200,
+      "durationFormatted": "59m 24s",
+      "agentCount": 0,
+      "interactionCount": 0,
+      "mcpConnectionCount": 0,
+      "protocolEventCount": 0,
+      "decisionCount": 0,
+      "successfulMCPConnections": 0,
+      "failedMCPConnections": 0,
+      "agentTypes": [],
+      "protocolsUsed": [],
+      "totalMessages": 0,
+      "totalErrors": 0
+    }
+  },
+  "agents": {},
+  "interactions": [],
+  "mcpConnections": [],
+  "protocolEvents": [],
+  "decisions": [],
+  "events": [],
+  "results": {
+    "steps": [
+      {
+        "step": "Multi-model analysis",
+        "error": null
+      },
+      {
+        "step": "Dynamic agent creation",
+        "error": null
+      },
+      {
+        "step": "Autonomous conversation",
+        "error": null
+      },
+      {
+        "step": "Multi-model consensus conclusion",
+        "error": null
+      }
+    ],
+    "overallStatus": "success"
+  }
+}
