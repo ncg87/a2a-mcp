@@ -6978,3 +6978,120 @@
 {"level":"info","message":"Email notifier initialized successfully","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:48:22"}
 {"level":"info","message":"Topic discovery engine initialized","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:48:22"}
 {"level":"info","message":"Insight evaluator initialized","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:48:22"}
+{"level":"info","message":"In-Memory message bus connected successfully","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:27"}
+{"level":"info","message":"Initializing External MCP Registry...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:27"}
+{"level":"info","message":"Loaded 13 public MCP servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:27"}
+{"level":"info","message":"Loaded 13 community MCP servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:27"}
+{"level":"info","message":"External MCP Registry initialized with 26 servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:27"}
+{"level":"info","message":"Interaction Documenter initialized","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:27"}
+{"level":"info","message":"Initializing AI Model Selector...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:27"}
+{"level":"info","message":"Detected 16 potential AI models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:27"}
+{"level":"info","message":"Selected default model: Anthropic Claude 4.1 Opus (Newest)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:27"}
+{"level":"info","message":"Model Selector initialized. Active model: Anthropic Claude 4.1 Opus (Newest)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:27"}
+{"level":"info","message":"Chat Logger initialized","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:27"}
+{"level":"info","message":"Initializing AI Client...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"OpenAI client configured","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"Anthropic client configured","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"AI Client initialized with 2 providers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"error","message":"AI API call failed for openai:","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"data":{"error":{"code":"unsupported_value","message":"Unsupported value: 'temperature' does not support 0.5 with this model. Only the default (1) value is supported.","param":"temperature","type":"invalid_request_error"}},"level":"error","message":"openai API Response Error:","service":"multi-agent-ensemble","status":400,"statusText":"Bad Request","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"Started documentation session: bce07366-1996-48d2-8f77-c87c2c65d9bf","prompt":"I want to reserach quant","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"Started chat log: chat-2025-08-25T15-50-32-659Z-I-want-to-reserach-quant.txt","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"Model Tier Distribution:","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"  PREMIUM: 5 models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"    Top models: Anthropic Claude 4.1 Opus (Newest), Anthropic Claude 3.5 Sonnet (Latest), Anthropic Claude 4 Sonnet","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"  BALANCED: 5 models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"    Top models: OpenAI GPT-4.1 Mini (Fast), OpenAI GPT-4.1 Nano (Ultra-Fast), OpenAI GPT-4o Mini (Fast)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"  FAST: 4 models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"    Top models: OpenAI GPT-4.1 Mini (Fast), OpenAI GPT-4.1 Nano (Ultra-Fast), OpenAI GPT-4o Mini (Fast)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"  ECONOMICAL: 3 models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"    Top models: OpenAI GPT-4.1 Nano (Ultra-Fast), OpenAI GPT-4o Mini (Fast), Anthropic Claude 3 Haiku (Legacy)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"Initializing MCP Client...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"Connecting to 4 essential MCP servers...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"Connecting to MCP server: Playwright Web Browser MCP","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"✅ Connected to Playwright Web Browser MCP (10 tools available)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"✅ Essential server connected: playwright-mcp","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"Connecting to MCP server: Sequential Thinking MCP","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"✅ Connected to Sequential Thinking MCP (8 tools available)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"✅ Essential server connected: sequential-thinking-mcp","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"Connecting to MCP server: Persistent Memory MCP","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"✅ Connected to Persistent Memory MCP (7 tools available)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"✅ Essential server connected: memory-mcp","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"Connecting to MCP server: File System MCP","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"✅ Connected to File System MCP (8 tools available)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"✅ Essential server connected: filesystem-mcp","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"info","message":"MCP Client initialized with 4 connected servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"level":"error","message":"AI API call failed for openai:","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:32"}
+{"data":{"error":{"code":"unsupported_value","message":"Unsupported value: 'temperature' does not support 0.3 with this model. Only the default (1) value is supported.","param":"temperature","type":"invalid_request_error"}},"level":"error","message":"openai API Response Error:","service":"multi-agent-ensemble","status":400,"statusText":"Bad Request","timestamp":"2025-08-25 11:50:32"}
+{"level":"error","message":"AI API call failed for openai:","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:33"}
+{"data":{"error":{"code":"unsupported_value","message":"Unsupported value: 'temperature' does not support 0.3 with this model. Only the default (1) value is supported.","param":"temperature","type":"invalid_request_error"}},"level":"error","message":"openai API Response Error:","service":"multi-agent-ensemble","status":400,"statusText":"Bad Request","timestamp":"2025-08-25 11:50:33"}
+{"level":"error","message":"AI API call failed for openai:","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:50:33"}
+{"data":{"error":{"code":"unsupported_value","message":"Unsupported value: 'temperature' does not support 0.3 with this model. Only the default (1) value is supported.","param":"temperature","type":"invalid_request_error"}},"level":"error","message":"openai API Response Error:","service":"multi-agent-ensemble","status":400,"statusText":"Bad Request","timestamp":"2025-08-25 11:50:33"}
+{"level":"info","message":"Initializing AI Client...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:52:58"}
+{"level":"info","message":"OpenAI client configured","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:52:58"}
+{"level":"info","message":"Anthropic client configured","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:52:58"}
+{"level":"info","message":"AI Client initialized with 2 providers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:52:58"}
+{"level":"info","message":"In-Memory message bus connected successfully","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:05"}
+{"level":"info","message":"Initializing External MCP Registry...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:05"}
+{"level":"info","message":"Loaded 13 public MCP servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:05"}
+{"level":"info","message":"Loaded 13 community MCP servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:05"}
+{"level":"info","message":"External MCP Registry initialized with 26 servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:05"}
+{"level":"info","message":"Interaction Documenter initialized","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:05"}
+{"level":"info","message":"Initializing AI Model Selector...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:05"}
+{"level":"info","message":"Detected 16 potential AI models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:05"}
+{"level":"info","message":"Selected default model: Anthropic Claude 4.1 Opus (Newest)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:05"}
+{"level":"info","message":"Model Selector initialized. Active model: Anthropic Claude 4.1 Opus (Newest)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:05"}
+{"level":"info","message":"Chat Logger initialized","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:05"}
+{"level":"info","message":"Initializing AI Client...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:12"}
+{"level":"info","message":"OpenAI client configured","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:12"}
+{"level":"info","message":"Anthropic client configured","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:12"}
+{"level":"info","message":"AI Client initialized with 2 providers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:12"}
+{"level":"info","message":"In-Memory message bus connected successfully","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:13"}
+{"level":"info","message":"Initializing External MCP Registry...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:13"}
+{"level":"info","message":"Loaded 13 public MCP servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:13"}
+{"level":"info","message":"Loaded 13 community MCP servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:13"}
+{"level":"info","message":"External MCP Registry initialized with 26 servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:13"}
+{"level":"info","message":"Interaction Documenter initialized","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:13"}
+{"level":"info","message":"Initializing AI Model Selector...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:13"}
+{"level":"info","message":"Detected 16 potential AI models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:13"}
+{"level":"info","message":"Selected default model: Anthropic Claude 4.1 Opus (Newest)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:13"}
+{"level":"info","message":"Model Selector initialized. Active model: Anthropic Claude 4.1 Opus (Newest)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:13"}
+{"level":"info","message":"Chat Logger initialized","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:13"}
+{"level":"info","message":"In-Memory message bus connected successfully","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"Initializing External MCP Registry...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"Loaded 13 public MCP servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"Loaded 13 community MCP servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"External MCP Registry initialized with 26 servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"Interaction Documenter initialized","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"Initializing AI Model Selector...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"Detected 16 potential AI models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"Selected default model: Anthropic Claude 4.1 Opus (Newest)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"Model Selector initialized. Active model: Anthropic Claude 4.1 Opus (Newest)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"Chat Logger initialized","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"Initializing AI Client...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:23"}
+{"level":"info","message":"Started documentation session: 3e6556cc-71f7-43df-b65d-191f7e36d87e","prompt":"research quant","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"Started chat log: chat-2025-08-25T15-53-26-139Z-research-quant.txt","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"Model Tier Distribution:","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"  PREMIUM: 5 models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"    Top models: Anthropic Claude 4.1 Opus (Newest), Anthropic Claude 3.5 Sonnet (Latest), Anthropic Claude 4 Sonnet","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"  BALANCED: 5 models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"    Top models: OpenAI GPT-4.1 Mini (Fast), OpenAI GPT-4.1 Nano (Ultra-Fast), OpenAI GPT-4o Mini (Fast)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"  FAST: 4 models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"    Top models: OpenAI GPT-4.1 Mini (Fast), OpenAI GPT-4.1 Nano (Ultra-Fast), OpenAI GPT-4o Mini (Fast)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"  ECONOMICAL: 3 models","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"    Top models: OpenAI GPT-4.1 Nano (Ultra-Fast), OpenAI GPT-4o Mini (Fast), Anthropic Claude 3 Haiku (Legacy)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"Initializing MCP Client...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"Connecting to 4 essential MCP servers...","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"Connecting to MCP server: Playwright Web Browser MCP","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"✅ Connected to Playwright Web Browser MCP (10 tools available)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"✅ Essential server connected: playwright-mcp","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"Connecting to MCP server: Sequential Thinking MCP","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"✅ Connected to Sequential Thinking MCP (8 tools available)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"✅ Essential server connected: sequential-thinking-mcp","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"Connecting to MCP server: Persistent Memory MCP","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"✅ Connected to Persistent Memory MCP (7 tools available)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"✅ Essential server connected: memory-mcp","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"Connecting to MCP server: File System MCP","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"✅ Connected to File System MCP (8 tools available)","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"✅ Essential server connected: filesystem-mcp","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}
+{"level":"info","message":"MCP Client initialized with 4 connected servers","service":"multi-agent-ensemble","timestamp":"2025-08-25 11:53:26"}

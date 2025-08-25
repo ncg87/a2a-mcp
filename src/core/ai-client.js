@@ -103,6 +103,11 @@ export class AIClient {
     if (!client) {
       throw new Error(`No client configured for provider: ${provider}`);
     }
+    
+    // Fix temperature for models that require specific values
+    if (options.temperature !== undefined) {
+      options.temperature = this.normalizeTemperature(modelId, options.temperature);
+    }
 
     try {
       switch (provider) {
@@ -143,18 +148,11 @@ export class AIClient {
    */
   async callOpenAI(client, prompt, options = {}) {
     const maxTokens = options.maxTokens || 1000;
-    let temperature = options.temperature || 0.7;
     // Use the newest models by default - GPT-4.1 or GPT-5 if available
     const model = options.specificModel || this.selectBestOpenAIModel();
-
-    // Some models only support temperature = 1 (like o1-preview, o1-mini)
-    const fixedTempModels = ['o1-preview', 'o1-mini', 'o1', 'gpt-5-thinking'];
-    if (fixedTempModels.some(m => model.includes(m))) {
-      temperature = 1; // These models only support default temperature
-    }
     
-    // Ensure temperature is within valid range for other models
-    temperature = Math.max(0, Math.min(2, temperature));
+    // Normalize temperature for this specific model
+    const temperature = this.normalizeTemperature(model, options.temperature || 0.7);
 
     // Use max_completion_tokens for newer models, max_tokens for older ones
     const tokenParam = model.startsWith('gpt-5') || model.startsWith('o3') || model.includes('4.1') || model.startsWith('o1')
@@ -175,8 +173,9 @@ export class AIClient {
       ]
     };
     
-    // Only add temperature if not using fixed-temp models
-    if (!fixedTempModels.some(m => model.includes(m))) {
+    // Add temperature (it's already normalized)
+    if (temperature !== 1) {
+      // Only add if not default value
       requestBody.temperature = temperature;
     }
     
@@ -704,6 +703,28 @@ Keep your response focused, technical, and around 2-3 sentences unless more deta
    */
   getAvailableProviders() {
     return Array.from(this.clients.keys());
+  }
+
+  /**
+   * Normalize temperature for specific model requirements
+   */
+  normalizeTemperature(modelId, temperature) {
+    // Models that only support temperature = 1
+    const fixedTempModels = [
+      'o1-preview', 'o1-mini', 'o1', 
+      'gpt-5-thinking', 'gpt-5', 'gpt-4.1'
+    ];
+    
+    // Check if this model requires fixed temperature
+    const modelLower = modelId.toLowerCase();
+    for (const fixedModel of fixedTempModels) {
+      if (modelLower.includes(fixedModel.toLowerCase())) {
+        return 1; // These models only support default temperature
+      }
+    }
+    
+    // For other models, ensure temperature is in valid range
+    return Math.max(0, Math.min(2, temperature));
   }
 }
 
