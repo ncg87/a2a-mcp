@@ -23,15 +23,18 @@ const rl = readline.createInterface({
 async function main() {
   console.clear();
   console.log('╔════════════════════════════════════════════════════════════════╗');
-  console.log('║         🔬 24/7 CONTINUOUS RESEARCH SYSTEM 🔬                  ║');
+  console.log('║      🔬 24/7 AUTONOMOUS RESEARCH SYSTEM 🔬                     ║');
   console.log('╚════════════════════════════════════════════════════════════════╝');
   console.log('');
   console.log('This system will continuously:');
-  console.log('  ✓ Research topics autonomously');
-  console.log('  ✓ Discover novel insights and connections');
-  console.log('  ✓ Email you important findings');
-  console.log('  ✓ Build a knowledge base over time');
-  console.log('  ✓ Explore new topics based on discoveries');
+  console.log('  ✨ Auto-generate FASCINATING research topics');
+  console.log('  🚨 Detect BREAKTHROUGH discoveries');
+  console.log('  📧 Email you when it finds something COOL');
+  console.log('  🧠 Build knowledge across cutting-edge fields');
+  console.log('  🔮 Explore mysteries and impossible science');
+  console.log('');
+  console.log('🤖 Topics include: Quantum consciousness, AGI emergence,');
+  console.log('   dark matter, time crystals, synthetic biology & more!');
   console.log('');
   
   // Check email configuration
@@ -109,9 +112,11 @@ async function getConfiguration() {
   };
   
   // Ask for initial topic
-  const initialTopic = await askQuestion('\n📝 Enter initial research topic (or press Enter for auto-discovery): ');
+  const initialTopic = await askQuestion('\n📝 Press Enter for AUTO-GENERATED topics (recommended!)\n   Or type a specific topic: ');
   if (initialTopic.trim()) {
     config.initialTopic = initialTopic.trim();
+  } else {
+    console.log('\n✨ Excellent choice! System will auto-generate mind-blowing topics!');
   }
   
   // Ask for base topics

@@ -11,6 +11,8 @@ import SharedMemoryBank from './shared-memory-bank.js';
 import EmailNotifier from './email-notifier.js';
 import TopicDiscoveryEngine from './topic-discovery-engine.js';
 import InsightEvaluator from './insight-evaluator.js';
+import AutonomousTopicGenerator from './autonomous-topic-generator.js';
+import DiscoveryEvaluator from './discovery-evaluator.js';
 import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -37,6 +39,8 @@ export class ContinuousResearchEngine extends EventEmitter {
     this.emailNotifier = new EmailNotifier(this.config.emailRecipient);
     this.topicDiscovery = new TopicDiscoveryEngine();
     this.insightEvaluator = new InsightEvaluator();
+    this.topicGenerator = new AutonomousTopicGenerator();
+    this.discoveryEvaluator = new DiscoveryEvaluator();
     
     // System state
     this.isRunning = false;
@@ -163,9 +167,26 @@ export class ContinuousResearchEngine extends EventEmitter {
         priority: 10,
         createdAt: Date.now()
       });
+    } else {
+      // Auto-generate fascinating initial topics
+      console.log('\n🤖 Auto-generating research topics...\n');
+      const autoTopics = this.topicGenerator.getTopicSuggestions(3);
+      
+      for (const suggestion of autoTopics) {
+        console.log(`  ✨ ${suggestion.topic} [${suggestion.category}]`);
+        this.topicQueue.push({
+          id: uuidv4(),
+          title: suggestion.topic,
+          source: 'auto-generated',
+          category: suggestion.category,
+          priority: 8 + suggestion.excitement,
+          createdAt: Date.now()
+        });
+      }
+      console.log();
     }
     
-    // Add base topics
+    // Add base topics if any
     for (const baseTopic of this.config.baseTopics) {
       this.topicQueue.push({
         id: uuidv4(),
@@ -415,27 +436,90 @@ ${context.previousConclusions.slice(0, 2).map(c => `- ${c.content}`).join('\n')}
       this.discoveredInsights.push(insight);
       this.stats.totalInsightsDiscovered++;
       
-      // Check if insight is email-worthy
-      if (this.shouldEmailInsight(insight)) {
-        this.queueEmailNotification(insight, topic);
-      }
+      // Evaluate discovery coolness
+      const evaluation = this.discoveryEvaluator.evaluateDiscovery(insight, {
+        topic: topic.title,
+        hasConsensus: insight.hasConsensus,
+        multipleAgentsAgreed: insight.agentAgreement > 0.6,
+        generatedInsight: insight.type === 'insight',
+        solvedProblem: insight.type === 'solution',
+        foundContradiction: insight.type === 'contradiction'
+      });
       
       console.log(`   💡 Discovered: ${insight.content.substring(0, 100)}...`);
-      console.log(`      Score: ${insight.score.toFixed(2)}, Type: ${insight.type}`);
+      console.log(`      Score: ${insight.score.toFixed(2)}, Coolness: ${evaluation.score.toFixed(2)}`);
+      console.log(`      ${evaluation.reason}`);
+      
+      // Handle email triggers based on coolness
+      if (evaluation.shouldEmailNow) {
+        if (evaluation.isSuperCool) {
+          // Send breakthrough email immediately
+          await this.sendBreakthroughEmail(insight, topic);
+        } else {
+          // Send batch email
+          const batch = this.discoveryEvaluator.getEmailBatch();
+          if (batch) {
+            await this.sendDiscoveryBatchEmail(batch);
+          }
+        }
+      }
     }
   }
 
   /**
-   * Determine if insight should trigger email
+   * Send breakthrough email immediately
    */
-  shouldEmailInsight(insight) {
-    return (
-      insight.score >= 0.8 || // High quality insights
-      insight.novelty >= 0.9 || // Very novel discoveries
-      insight.actionability >= 0.85 || // Highly actionable
-      insight.type === 'breakthrough' || // Breakthrough discoveries
-      insight.type === 'critical' // Critical findings
-    );
+  async sendBreakthroughEmail(insight, topic) {
+    const emailData = {
+      subject: `🚨 BREAKTHROUGH: ${topic.title}`,
+      content: {
+        title: 'Extraordinary Discovery!',
+        insights: [{
+          topic: topic.title,
+          content: insight.content,
+          score: insight.score * 10,
+          timestamp: new Date().toISOString()
+        }],
+        summary: `This is a breakthrough discovery with exceptional significance. ` +
+                 `The research system has uncovered something truly remarkable.`,
+        metadata: {
+          discoveryType: 'breakthrough',
+          urgency: 'high',
+          confidence: insight.confidence || 0.9
+        }
+      }
+    };
+    
+    await this.emailNotifier.sendInsightEmail(emailData);
+    this.stats.totalEmailsSent++;
+    console.log('\n   📧 BREAKTHROUGH EMAIL SENT!\n');
+  }
+
+  /**
+   * Send batch of cool discoveries
+   */
+  async sendDiscoveryBatchEmail(batch) {
+    const emailData = {
+      subject: batch.headline,
+      content: {
+        title: 'Cool Discoveries Collection',
+        insights: batch.discoveries.map(d => ({
+          topic: d.topic,
+          content: d.content,
+          score: (d.coolness * 10).toFixed(1),
+          timestamp: d.timestamp || new Date().toISOString()
+        })),
+        summary: batch.summary,
+        metadata: {
+          batchSize: batch.discoveries.length,
+          averageCoolness: (batch.discoveries.reduce((sum, d) => sum + d.coolness, 0) / batch.discoveries.length).toFixed(2)
+        }
+      }
+    };
+    
+    await this.emailNotifier.sendInsightEmail(emailData);
+    this.stats.totalEmailsSent++;
+    console.log(`\n   📧 Discovery batch email sent (${batch.discoveries.length} findings)\n`);
   }
 
   /**
@@ -471,7 +555,44 @@ ${context.previousConclusions.slice(0, 2).map(c => `- ${c.content}`).join('\n')}
   async discoverNewTopics() {
     console.log('   🔎 Discovering new topics...');
     
-    // Get trending topics
+    // Auto-generate fascinating topics
+    const autoGenerated = [];
+    const suggestions = this.topicGenerator.getTopicSuggestions(3);
+    
+    for (const suggestion of suggestions) {
+      autoGenerated.push({
+        id: uuidv4(),
+        title: suggestion.topic,
+        source: 'auto-discovery',
+        category: suggestion.category,
+        priority: 7 + suggestion.excitement,
+        createdAt: Date.now()
+      });
+      console.log(`      ✨ Auto-discovered: ${suggestion.topic}`);
+    }
+    
+    // Generate related topics based on recent discoveries
+    if (this.discoveredInsights.length > 0) {
+      const lastInsight = this.discoveredInsights[this.discoveredInsights.length - 1];
+      const related = this.topicGenerator.generateRelatedTopic(
+        lastInsight.topic,
+        this.discoveredInsights.slice(-5)
+      );
+      
+      if (related) {
+        autoGenerated.push({
+          id: uuidv4(),
+          title: related.topic,
+          source: 'related-discovery',
+          category: related.category,
+          priority: 8,
+          createdAt: Date.now()
+        });
+        console.log(`      🔗 Related topic: ${related.topic}`);
+      }
+    }
+    
+    // Get trending topics from discovery engine
     const trending = await this.topicDiscovery.getTrendingTopics();
     
     // Get topics from recent insights
@@ -479,11 +600,8 @@ ${context.previousConclusions.slice(0, 2).map(c => `- ${c.content}`).join('\n')}
       this.discoveredInsights.slice(-20)
     );
     
-    // Get random exploration topics
-    const exploration = await this.topicDiscovery.getExplorationTopics();
-    
-    // Combine and queue new topics
-    const newTopics = [...trending, ...fromInsights, ...exploration];
+    // Combine all new topics
+    const newTopics = [...autoGenerated, ...trending, ...fromInsights];
     
     for (const topicTitle of newTopics) {
       // Check if not already processed
