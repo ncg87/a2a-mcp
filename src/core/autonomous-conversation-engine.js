@@ -946,10 +946,29 @@ Key Decisions: ${this.conversationContext.decisions.join(', ')}`;
   }
 
   async generateDiscussionTopic(action, agents) {
+    // Generate more engaging and specific discussion topics
+    const topicVariations = [
+      `Brainstorming innovative approaches for: ${action.description}`,
+      `Exploring cutting-edge solutions to: ${action.description}`,
+      `Collaborative problem-solving session: ${action.description}`,
+      `Multi-perspective analysis of: ${action.description}`,
+      `Creative workshop on: ${action.description}`
+    ];
+    
+    const focusAreas = [
+      'technical implementation and architecture',
+      'innovative solutions and creative approaches',
+      'practical applications and real-world impact',
+      'theoretical foundations and future implications',
+      'optimization strategies and best practices'
+    ];
+    
     return {
-      title: action.description,
-      focus: 'technical implementation',
-      participants: agents.map(a => a.type)
+      title: topicVariations[Math.floor(Math.random() * topicVariations.length)],
+      focus: focusAreas[Math.floor(Math.random() * focusAreas.length)],
+      participants: agents.map(a => a.type),
+      collaborativeGoal: `Generate actionable insights through ${agents.length}-way collaboration`,
+      expectedOutcome: 'Novel ideas, validated approaches, and synthesized conclusions'
     };
   }
 
@@ -990,22 +1009,36 @@ Key Decisions: ${this.conversationContext.decisions.join(', ')}`;
         subAgentContext = `\n\nSub-Agent Results: ${JSON.stringify(subAgentResults, null, 2)}`;
       }
 
-      const prompt = `As a ${agent.type} specialist, respond to this discussion topic: "${topic.title}"
+      // Get conversation history for context
+      const recentHistory = this.conversationMemory.slice(-5).map(m => 
+        `${m.agent}: ${m.content?.substring(0, 150)}...`
+      ).join('\n');
       
-This is round ${round + 1} of discussion with ${targetAgent.type}.
-Context: ${agent.purpose}
+      const collaborationMode = this.getCollaborationMode(round, agent.type, targetAgent.type);
+      
+      const prompt = `As a ${agent.type} specialist in collaborative discussion with ${targetAgent.type} about: "${topic.title}"
+      
+Round ${round + 1} - Mode: ${collaborationMode}
+Your role: ${agent.purpose}
 ${mcpContext}${subAgentContext}
 
-IMPORTANT: If you are uncertain about facts, dates, current events, or technical details, the system has automatically searched for current information above. Use this verified information rather than potentially outdated knowledge.
+Previous Discussion Points:
+${recentHistory || 'Starting fresh discussion'}
 
-${subAgentResults ? 'IMPORTANT: You have sub-agents working for you. Use their specialized results above to enhance your response with their detailed analysis.' : ''}
+COLLABORATION INSTRUCTIONS for ${collaborationMode}:
+${this.getCollaborationInstructions(collaborationMode, round, agent.type, targetAgent.type)}
 
-Available capabilities: 
-- MCP tools: web browsing, sequential thinking, memory storage, code execution, file operations
-- Sub-agent creation: You can create specialized worker agents for complex tasks
-- Knowledge verification: Automatic fact-checking for uncertain information
+${needsVerification ? 'VERIFIED FACTS: Use the verification results above for accuracy.' : ''}
+${subAgentResults ? 'SUB-AGENT INSIGHTS: Incorporate specialized analysis from your sub-agents.' : ''}
 
-Provide a technical response (2-3 sentences) that synthesizes all available information:`;
+Respond in a collaborative manner that:
+1. ${collaborationMode === 'brainstorm' ? 'Proposes creative ideas and builds on previous suggestions' : ''}
+2. ${collaborationMode === 'analyze' ? 'Critically examines the topic and provides deeper insights' : ''}  
+3. ${collaborationMode === 'synthesize' ? 'Combines ideas into actionable conclusions' : ''}
+4. ${collaborationMode === 'challenge' ? 'Respectfully challenges assumptions and proposes alternatives' : ''}
+5. Always acknowledges and builds upon the ${targetAgent.type}'s contributions
+
+Your response (2-4 sentences):`;
 
       // Use the actual model name from the agent's assigned model
       const modelToUse = agent.assignedModel.model || agent.assignedModel.id;
@@ -1036,6 +1069,56 @@ Provide a technical response (2-3 sentences) that synthesizes all available info
         createdSubAgents: false
       };
     }
+  }
+
+  /**
+   * Get collaboration mode based on round and agent types
+   */
+  getCollaborationMode(round, agentType, targetType) {
+    const modes = ['brainstorm', 'analyze', 'challenge', 'synthesize'];
+    const modeIndex = round % modes.length;
+    
+    // Special logic for certain agent combinations
+    if (agentType === 'research' && targetType === 'analyst') {
+      return round < 2 ? 'brainstorm' : 'analyze';
+    }
+    if (round === 0) return 'brainstorm';
+    if (round >= 4) return 'synthesize';
+    
+    return modes[modeIndex];
+  }
+  
+  /**
+   * Get collaboration instructions based on mode
+   */
+  getCollaborationInstructions(mode, round, agentType, targetType) {
+    const instructions = {
+      brainstorm: `- Propose innovative ideas and creative approaches
+- Say things like "What if we..." or "Building on that idea..."
+- Acknowledge previous contributions with "Great point about..."
+- Suggest complementary perspectives
+- Be enthusiastic and supportive`,
+      
+      analyze: `- Examine the topic from your specialized perspective
+- Say things like "From a ${agentType} perspective..." or "The data suggests..."
+- Reference specific insights from previous discussions
+- Provide evidence-based analysis
+- Identify patterns and connections`,
+      
+      challenge: `- Respectfully question assumptions with "Have we considered..."
+- Propose alternative viewpoints with "Another angle might be..."
+- Test ideas for robustness
+- Identify potential issues or gaps
+- Always maintain constructive tone`,
+      
+      synthesize: `- Combine the best ideas discussed so far
+- Say things like "Bringing together our insights..." or "The consensus seems to be..."
+- Highlight key takeaways and actionable items
+- Acknowledge all contributors
+- Propose next steps or conclusions`
+    };
+    
+    return instructions[mode] || instructions.brainstorm;
   }
 
   /**

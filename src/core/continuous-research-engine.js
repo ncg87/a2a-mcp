@@ -304,7 +304,8 @@ export class ContinuousResearchEngine extends EventEmitter {
       startTime: Date.now(),
       insights: [],
       agents: [],
-      iterations: 0
+      iterations: 0,
+      conclusion: null
     };
     
     this.researchSessions.set(researchSession.id, researchSession);
@@ -322,10 +323,25 @@ export class ContinuousResearchEngine extends EventEmitter {
         topic
       );
       
+      // Generate conclusion from research
+      const conclusion = await this.generateConclusion(topic, insights, this.conversationEngine.conversationMemory);
+      
       researchSession.insights = insights;
+      researchSession.conclusion = conclusion;
       researchSession.agents = Array.from(this.conversationEngine.activeAgents.values());
       researchSession.iterations = this.conversationEngine.currentIteration;
       researchSession.endTime = Date.now();
+      
+      // Store conclusion in shared memory
+      if (conclusion) {
+        await this.sharedMemory.storeMemory({
+          type: 'conclusion',
+          content: conclusion,
+          topic: topic.title,
+          timestamp: Date.now(),
+          importance: 0.8
+        });
+      }
       
       // Update statistics
       this.stats.totalAgentsCreated += researchSession.agents.length;
@@ -392,6 +408,63 @@ ${context.previousConclusions.slice(0, 2).map(c => `- ${c.content}`).join('\n')}
     prompt += `\n\nFocus on discovering NEW information and connections not already known.`;
 
     return prompt;
+  }
+
+  /**
+   * Generate conclusion from research
+   */
+  async generateConclusion(topic, insights, conversationMemory) {
+    try {
+      // Combine key insights
+      const keyInsights = insights
+        .filter(i => i.score > 0.6)
+        .slice(0, 5)
+        .map(i => i.content)
+        .join('\n- ');
+      
+      // Extract key discussion points
+      const keyPoints = conversationMemory
+        .filter(msg => msg.content && msg.content.length > 100)
+        .slice(-10)
+        .map(msg => {
+          const lines = msg.content.split('\n');
+          return lines.find(line => 
+            line.includes('discovered') || 
+            line.includes('found') || 
+            line.includes('important') ||
+            line.includes('conclude') ||
+            line.includes('result')
+          ) || lines[0];
+        })
+        .filter(Boolean)
+        .slice(0, 3)
+        .join('\n');
+      
+      const prompt = `Based on the research conducted on "${topic.title}", synthesize a comprehensive conclusion.
+
+Key Insights:
+${keyInsights || 'No significant insights extracted'}
+
+Key Discussion Points:
+${keyPoints || 'No key points identified'}
+
+Generate a 2-3 paragraph conclusion that:
+1. Summarizes the main findings
+2. Highlights the most important discoveries
+3. Suggests potential implications or applications
+4. Identifies areas for future research
+
+Conclusion:`;
+      
+      // Use the AI to generate conclusion
+      const response = await this.aiInterface.generateResponse(prompt);
+      
+      return response || `Research on "${topic.title}" yielded ${insights.length} insights with interesting implications for future exploration.`;
+      
+    } catch (error) {
+      logger.error('Failed to generate conclusion:', error);
+      return `Research completed on "${topic.title}" with ${insights.length} insights discovered.`;
+    }
   }
 
   /**
@@ -868,7 +941,9 @@ ${context.previousConclusions.slice(0, 2).map(c => `- ${c.content}`).join('\n')}
    * Hash topic for deduplication
    */
   hashTopic(title) {
-    return title.toLowerCase().replace(/[^a-z0-9]/g, '');
+    // Ensure title is a string before processing
+    const titleStr = String(title || '');
+    return titleStr.toLowerCase().replace(/[^a-z0-9]/g, '');
   }
 
   /**

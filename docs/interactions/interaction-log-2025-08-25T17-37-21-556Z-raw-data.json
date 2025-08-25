@@ -1,0 +1,57 @@
+{
+  "session": {
+    "id": "3e6556cc-71f7-43df-b65d-191f7e36d87e",
+    "prompt": "research quant",
+    "analysis": {
+      "complexity": 10,
+      "taskType": "autonomous",
+      "models": 16,
+      "agents": 3
+    },
+    "startTime": "2025-08-25T15:53:26.137Z",
+    "endTime": "2025-08-25T17:37:21.553Z",
+    "status": "success",
+    "statistics": {
+      "duration": 6235416,
+      "durationFormatted": "1h 43m 55s",
+      "agentCount": 0,
+      "interactionCount": 0,
+      "mcpConnectionCount": 0,
+      "protocolEventCount": 0,
+      "decisionCount": 0,
+      "successfulMCPConnections": 0,
+      "failedMCPConnections": 0,
+      "agentTypes": [],
+      "protocolsUsed": [],
+      "totalMessages": 0,
+      "totalErrors": 0
+    }
+  },
+  "agents": {},
+  "interactions": [],
+  "mcpConnections": [],
+  "protocolEvents": [],
+  "decisions": [],
+  "events": [],
+  "results": {
+    "steps": [
+      {
+        "step": "Multi-model analysis",
+        "error": null
+      },
+      {
+        "step": "Dynamic agent creation",
+        "error": null
+      },
+      {
+        "step": "Autonomous conversation",
+        "error": null
+      },
+      {
+        "step": "Multi-model consensus conclusion",
+        "error": null
+      }
+    ],
+    "overallStatus": "success"
+  }
+}
