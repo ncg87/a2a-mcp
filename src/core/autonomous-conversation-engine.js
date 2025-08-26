@@ -580,30 +580,124 @@ Respond with JSON:
    * Generate autonomous conclusion using all models
    */
   async generateAutonomousConclusion() {
-    console.log(`\n🎯 Generating autonomous conclusion...`);
+    console.log(`\n🎯 Generating autonomous conclusion from ${this.getAvailableModels().length} models...`);
     
     const models = this.getAvailableModels();
     const conclusions = [];
+    const failedModels = [];
     
     const finalContext = this.buildFinalContext();
     
-    for (const model of models) {
+    // Process models in parallel with retry logic
+    const conclusionPromises = models.map(model => 
+      this.getConclusionFromModel(model, finalContext)
+    );
+    
+    // Wait for all conclusions with timeout
+    const results = await Promise.allSettled(conclusionPromises);
+    
+    // Process results
+    results.forEach((result, index) => {
+      const model = models[index];
+      if (result.status === 'fulfilled' && result.value) {
+        conclusions.push(result.value);
+        console.log(`   ✅ Got conclusion from ${model.name}`);
+      } else {
+        failedModels.push(model);
+        console.log(`   ⚠️ Failed to get conclusion from ${model.name}`);
+      }
+    });
+    
+    // Retry failed models with different approach
+    if (failedModels.length > 0) {
+      console.log(`   🔄 Retrying ${failedModels.length} failed models...`);
+      for (const model of failedModels) {
+        const retryConclusion = await this.retryModelConclusion(model, finalContext);
+        if (retryConclusion) {
+          conclusions.push(retryConclusion);
+          console.log(`   ✅ Retry successful for ${model.name}`);
+        }
+      }
+    }
+    
+    console.log(`   📊 Collected ${conclusions.length}/${models.length} model conclusions`);
+    
+    // Synthesize final conclusion from all models
+    const finalConclusion = await this.synthesizeConclusions(conclusions);
+    
+    await this.chatLogger.addAgentResponse(
+      'autonomous-coordinator',
+      'autonomous-system',
+      finalConclusion,
+      {
+        model: 'Multi-Model Synthesis',
+        responseTime: 0,
+        iteration: this.currentIteration,
+        messageType: 'autonomous-conclusion',
+        modelsUsed: conclusions.length,
+        totalModels: models.length
+      }
+    );
+
+    console.log(`✅ Autonomous conclusion generated from ${conclusions.length} models`);
+  }
+  
+  /**
+   * Get conclusion from a specific model with retry logic
+   */
+  async getConclusionFromModel(model, context, retryCount = 3) {
+    const conclusionPrompt = this.buildConclusionPrompt(context);
+    
+    for (let attempt = 1; attempt <= retryCount; attempt++) {
       try {
         const conclusion = await this.aiClient.generateResponse(model.id,
-          `Synthesize a comprehensive conclusion for this autonomous multi-agent conversation.
+          conclusionPrompt,
+          {
+            agentType: 'synthesizer',
+            maxTokens: 500,
+            temperature: 0.5,
+            timeout: 30000 // 30 second timeout
+          }
+        );
+        
+        if (conclusion && conclusion.content) {
+          return {
+            model: model.name,
+            content: conclusion.content,
+            attempt: attempt
+          };
+        }
+      } catch (error) {
+        logger.warn(`Attempt ${attempt}/${retryCount} failed for ${model.name}:`, error.message);
+        
+        if (attempt < retryCount) {
+          // Wait before retry with exponential backoff
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+      }
+    }
+    
+    return null; // All attempts failed
+  }
+  
+  /**
+   * Build conclusion prompt
+   */
+  buildConclusionPrompt(context) {
+    return `Synthesize a comprehensive conclusion for this autonomous multi-agent conversation.
 
 CONVERSATION OVERVIEW:
-- Primary Objective: ${this.currentObjective.mainObjective}
+- Primary Objective: ${this.currentObjective?.mainObjective || 'Not specified'}
 - Total Iterations: ${this.currentIteration}
 - Agents Deployed: ${this.activeAgents.size} agents
 - Key Decisions Made: ${this.conversationContext.decisions.length}
-- Conversation Complexity: ${this.currentObjective.complexity}/10
+- Conversation Complexity: ${this.currentObjective?.complexity || 5}/10
 
 DETAILED CONTEXT:
-${finalContext}
+${context}
 
 RECENT KEY INSIGHTS:
-${this.conversationMemory.slice(-5).filter(m => m.content && m.content.length > 50).map(m => `- ${m.content.substring(0, 150)}...`).join('\n')}
+${this.conversationMemory.slice(-5).filter(m => m.content && m.content.length > 50).map(m => `- ${m.content.substring(0, 150)}...`).join('\n') || 'No recent insights available'}
 
 INSTRUCTIONS: Write a detailed conclusion that includes:
 
@@ -630,39 +724,81 @@ INSTRUCTIONS: Write a detailed conclusion that includes:
    - Unique insights from multi-agent collaboration
 
 IMPORTANT: Provide specific, concrete details from the actual conversation. 
-Write 4-5 substantial paragraphs with real substance, not generic statements:`,
-          {
-            agentType: 'synthesizer',
-            maxTokens: 400,
-            temperature: 0.5
-          }
-        );
+Write 4-5 substantial paragraphs with real substance, not generic statements:`;
+  }
+  
+  /**
+   * Retry conclusion generation for failed models
+   */
+  async retryModelConclusion(model, context) {
+    console.log(`      Retrying ${model.name} with simplified prompt...`);
+    
+    try {
+      // Try with a simpler, more focused prompt
+      const simplePrompt = `Based on this multi-agent conversation about "${this.currentObjective?.mainObjective || 'the topic'}":
 
-        conclusions.push({
+Key Points Discussed:
+${this.conversationMemory.slice(-10).filter(m => m.content).map(m => `- ${m.content.substring(0, 100)}...`).join('\n')}
+
+Provide a brief but comprehensive conclusion covering:
+1. What was accomplished
+2. Key decisions made
+3. Recommended next steps
+
+Write 2-3 paragraphs:`;
+      
+      const response = await this.aiClient.generateResponse(model.id, simplePrompt, {
+        agentType: 'summarizer',
+        maxTokens: 300,
+        temperature: 0.6,
+        timeout: 20000 // Shorter timeout for retry
+      });
+      
+      if (response && response.content) {
+        return {
           model: model.name,
-          content: conclusion.content
-        });
-      } catch (error) {
-        logger.error(`Failed to generate conclusion from ${model.name}:`, error.message);
+          content: response.content,
+          isRetry: true
+        };
+      }
+    } catch (retryError) {
+      logger.error(`Retry also failed for ${model.name}:`, retryError.message);
+      
+      // Last resort: try with a different model from same provider
+      const alternativeModel = await this.findAlternativeModel(model);
+      if (alternativeModel) {
+        return this.getConclusionFromModel(alternativeModel, context, 1);
       }
     }
-
-    // Synthesize final conclusion from all models
-    const finalConclusion = await this.synthesizeConclusions(conclusions);
     
-    await this.chatLogger.addAgentResponse(
-      'autonomous-coordinator',
-      'autonomous-system',
-      finalConclusion,
-      {
-        model: 'Multi-Model Synthesis',
-        responseTime: 0,
-        iteration: this.currentIteration,
-        messageType: 'autonomous-conclusion'
-      }
+    return null;
+  }
+  
+  /**
+   * Find an alternative model from the same provider
+   */
+  async findAlternativeModel(failedModel) {
+    const models = this.getAvailableModels();
+    
+    // Try to find a model from the same provider
+    const sameProvider = models.find(m => 
+      m.id !== failedModel.id && 
+      m.provider === failedModel.provider
     );
-
-    console.log(`✅ Autonomous conclusion generated from ${conclusions.length} models`);
+    
+    if (sameProvider) {
+      console.log(`      Using alternative model: ${sameProvider.name}`);
+      return sameProvider;
+    }
+    
+    // Fall back to any available model
+    const anyModel = models.find(m => m.id !== failedModel.id);
+    if (anyModel) {
+      console.log(`      Using fallback model: ${anyModel.name}`);
+      return anyModel;
+    }
+    
+    return null;
   }
 
   // Helper methods for the autonomous system
@@ -1891,7 +2027,26 @@ Perform your specialized task and provide focused results (2-3 sentences). Be sp
       synthesis += `### Detailed Analysis:\n${conclusions[0].content}\n\n`;
     }
     
-    synthesis += `---\n[This conclusion synthesized from ${conclusions.length} different AI models: ${conclusions.map(c => c.model).join(', ')}]`;
+    // Add metadata about conclusion generation
+    synthesis += `---\n`;
+    synthesis += `[This conclusion synthesized from ${conclusions.length} AI models]\n`;
+    
+    // Show which models contributed
+    const successfulModels = conclusions.filter(c => !c.isRetry).map(c => c.model);
+    const retryModels = conclusions.filter(c => c.isRetry).map(c => c.model);
+    
+    if (successfulModels.length > 0) {
+      synthesis += `✅ Direct responses: ${successfulModels.join(', ')}\n`;
+    }
+    if (retryModels.length > 0) {
+      synthesis += `🔄 Retry responses: ${retryModels.join(', ')}\n`;
+    }
+    
+    // Show attempts if any required retry
+    const retriedConclusions = conclusions.filter(c => c.attempt && c.attempt > 1);
+    if (retriedConclusions.length > 0) {
+      synthesis += `📊 Average attempts: ${(retriedConclusions.reduce((sum, c) => sum + c.attempt, 0) / retriedConclusions.length).toFixed(1)}\n`;
+    }
     
     return synthesis;
   }
