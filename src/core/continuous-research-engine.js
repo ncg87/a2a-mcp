@@ -13,6 +13,7 @@ import TopicDiscoveryEngine from './topic-discovery-engine.js';
 import InsightEvaluator from './insight-evaluator.js';
 import AutonomousTopicGenerator from './autonomous-topic-generator.js';
 import DiscoveryEvaluator from './discovery-evaluator.js';
+import AIClient from './ai-client.js';
 import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -35,6 +36,7 @@ export class ContinuousResearchEngine extends EventEmitter {
     
     // System components
     this.conversationEngine = null;
+    this.aiClient = new AIClient();
     this.sharedMemory = new SharedMemoryBank();
     this.emailNotifier = new EmailNotifier(this.config.emailRecipient);
     this.topicDiscovery = new TopicDiscoveryEngine();
@@ -121,6 +123,10 @@ export class ContinuousResearchEngine extends EventEmitter {
    * Initialize system components
    */
   async initializeComponents() {
+    // Initialize AI client
+    await this.aiClient.initialize();
+    logger.info(`AI client initialized with providers: ${this.aiClient.getAvailableProviders().join(', ')}`);
+    
     // Initialize shared memory
     await this.sharedMemory.initialize();
     logger.info(`Shared memory initialized with ${this.sharedMemory.getEntryCount()} existing entries`);
@@ -142,6 +148,9 @@ export class ContinuousResearchEngine extends EventEmitter {
     const chatLogger = new ChatLogger();
     const modelSelector = new ModelSelector();
     const mcpRegistry = new ExternalMCPRegistry();
+    
+    // Start a research session chat log
+    await chatLogger.startChatLog('Continuous Research Session - 24/7 Autonomous Discovery', 'research-continuous');
     
     this.conversationEngine = new AutonomousConversationEngine(
       chatLogger,
@@ -334,13 +343,11 @@ export class ContinuousResearchEngine extends EventEmitter {
       
       // Store conclusion in shared memory
       if (conclusion) {
-        await this.sharedMemory.storeMemory({
-          type: 'conclusion',
-          content: conclusion,
-          topic: topic.title,
-          timestamp: Date.now(),
-          importance: 0.8
-        });
+        await this.sharedMemory.storeConclusion(
+          conclusion,
+          topic.title,
+          insights.map(i => i.id).filter(Boolean)
+        );
       }
       
       // Update statistics
@@ -457,9 +464,12 @@ Generate a 2-3 paragraph conclusion that:
 Conclusion:`;
       
       // Use the AI to generate conclusion
-      const response = await this.aiInterface.generateResponse(prompt);
+      const response = await this.aiClient.generateResponse('claude-3-haiku-20240307', prompt, {
+        maxTokens: 300,
+        temperature: 0.7
+      });
       
-      return response || `Research on "${topic.title}" yielded ${insights.length} insights with interesting implications for future exploration.`;
+      return response.content || `Research on "${topic.title}" yielded ${insights.length} insights with interesting implications for future exploration.`;
       
     } catch (error) {
       logger.error('Failed to generate conclusion:', error);

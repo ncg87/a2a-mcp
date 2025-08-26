@@ -590,23 +590,47 @@ Respond with JSON:
     for (const model of models) {
       try {
         const conclusion = await this.aiClient.generateResponse(model.id,
-          `Provide a comprehensive conclusion for this autonomous conversation:
+          `Synthesize a comprehensive conclusion for this autonomous multi-agent conversation.
 
-Objective: ${this.currentObjective.mainObjective}
-Iterations: ${this.currentIteration}
-Agents created: ${this.activeAgents.size}
-Key decisions: ${this.conversationContext.decisions.length}
+CONVERSATION OVERVIEW:
+- Primary Objective: ${this.currentObjective.mainObjective}
+- Total Iterations: ${this.currentIteration}
+- Agents Deployed: ${this.activeAgents.size} agents
+- Key Decisions Made: ${this.conversationContext.decisions.length}
+- Conversation Complexity: ${this.currentObjective.complexity}/10
 
-Context:
+DETAILED CONTEXT:
 ${finalContext}
 
-Write a professional conclusion covering:
-1. What was accomplished
-2. Key decisions and solutions
-3. Implementation readiness
-4. Recommendations
+RECENT KEY INSIGHTS:
+${this.conversationMemory.slice(-5).filter(m => m.content && m.content.length > 50).map(m => `- ${m.content.substring(0, 150)}...`).join('\n')}
 
-Keep it comprehensive but concise (3-4 paragraphs):`,
+INSTRUCTIONS: Write a detailed conclusion that includes:
+
+1. ACCOMPLISHMENTS (What was successfully achieved):
+   - List specific outcomes and solutions developed
+   - Highlight breakthrough insights or innovations
+
+2. KEY DECISIONS & CONSENSUS POINTS:
+   - Summarize major decisions reached
+   - Note areas of agent agreement/disagreement
+
+3. TECHNICAL DETAILS:
+   - Architectural approaches discussed
+   - Implementation strategies proposed
+   - Technical challenges identified and solutions
+
+4. ACTIONABLE RECOMMENDATIONS:
+   - Next steps for implementation
+   - Specific actions to take forward
+   - Areas requiring further investigation
+
+5. SYNTHESIS:
+   - Overall assessment of the conversation's value
+   - Unique insights from multi-agent collaboration
+
+IMPORTANT: Provide specific, concrete details from the actual conversation. 
+Write 4-5 substantial paragraphs with real substance, not generic statements:`,
           {
             agentType: 'synthesizer',
             maxTokens: 400,
@@ -708,12 +732,70 @@ Keep it comprehensive but concise (3-4 paragraphs):`,
   }
 
   buildFinalContext() {
-    return `Conversation Memory (${this.conversationMemory.length} entries):
-${this.conversationMemory.map(m => `- ${m.type}: ${m.content?.substring(0, 100)}...`).join('\n')}
-
-Active Agents: ${Array.from(this.activeAgents.values()).map(a => `${a.type} (${a.assignedModel.name})`).join(', ')}
-
-Key Decisions: ${this.conversationContext.decisions.join(', ')}`;
+    // Get the most substantive messages
+    const substantiveMessages = this.conversationMemory
+      .filter(m => m.content && m.content.length > 100)
+      .slice(-15);
+    
+    // Extract key themes from messages
+    const themes = new Set();
+    substantiveMessages.forEach(msg => {
+      if (msg.content.includes('architect')) themes.add('System Architecture');
+      if (msg.content.includes('coordinator')) themes.add('Agent Coordination');
+      if (msg.content.includes('implement')) themes.add('Implementation Strategy');
+      if (msg.content.includes('framework')) themes.add('Framework Design');
+      if (msg.content.includes('protocol')) themes.add('Communication Protocols');
+      if (msg.content.includes('hybrid')) themes.add('Hybrid Approaches');
+    });
+    
+    // Build detailed context
+    let context = `CONVERSATION THEMES: ${Array.from(themes).join(', ')}\n\n`;
+    
+    context += `AGENT CONTRIBUTIONS (${this.activeAgents.size} agents):\n`;
+    Array.from(this.activeAgents.values()).forEach(agent => {
+      const agentMessages = this.conversationMemory.filter(m => m.agent === agent.id);
+      if (agentMessages.length > 0) {
+        const lastMessage = agentMessages[agentMessages.length - 1];
+        context += `\n${agent.type.toUpperCase()} (${agent.assignedModel.name}):\n`;
+        context += `- Messages: ${agentMessages.length}\n`;
+        context += `- Focus: ${agent.purpose || 'General discussion'}\n`;
+        if (lastMessage.content) {
+          context += `- Latest insight: "${lastMessage.content.substring(0, 200)}..."\n`;
+        }
+      }
+    });
+    
+    context += `\nKEY DISCUSSION POINTS:\n`;
+    substantiveMessages.forEach((msg, idx) => {
+      if (msg.content) {
+        // Extract the most important sentence from each message
+        const sentences = msg.content.split('. ');
+        const importantSentence = sentences.find(s => 
+          s.includes('propose') || s.includes('suggest') || s.includes('important') || 
+          s.includes('key') || s.includes('should') || s.includes('critical')
+        ) || sentences[0];
+        
+        if (importantSentence) {
+          context += `${idx + 1}. ${importantSentence.substring(0, 150)}...\n`;
+        }
+      }
+    });
+    
+    if (this.conversationContext.decisions.length > 0) {
+      context += `\nDECISIONS REACHED:\n`;
+      this.conversationContext.decisions.forEach((decision, idx) => {
+        context += `${idx + 1}. ${decision}\n`;
+      });
+    }
+    
+    if (this.conversationContext.openQuestions.length > 0) {
+      context += `\nOPEN QUESTIONS:\n`;
+      this.conversationContext.openQuestions.slice(-5).forEach((question, idx) => {
+        context += `${idx + 1}. ${question}\n`;
+      });
+    }
+    
+    return context;
   }
 
   /**
@@ -1745,13 +1827,115 @@ Perform your specialized task and provide focused results (2-3 sentences). Be sp
   }
 
   async synthesizeConclusions(conclusions) {
-    if (conclusions.length === 0) {
-      return 'Autonomous conversation completed without available model conclusions.';
+    // If no model-generated conclusions, create one from conversation memory
+    if (conclusions.length === 0 || !conclusions[0].content) {
+      return this.generateFallbackConclusion();
     }
     
-    // Simple synthesis - in practice this could be more sophisticated
-    const bestConclusion = conclusions[0];
-    return `${bestConclusion.content}\n\n[This conclusion synthesized from ${conclusions.length} different AI models: ${conclusions.map(c => c.model).join(', ')}]`;
+    // Extract key points from all conclusions
+    const keyPoints = new Set();
+    const recommendations = new Set();
+    const accomplishments = new Set();
+    
+    for (const conclusion of conclusions) {
+      if (!conclusion.content) continue;
+      
+      // Extract sentences about what was accomplished
+      const accomplishmentMatches = conclusion.content.match(/(?:accomplished|achieved|completed|developed|created|implemented)[^.]+\./gi);
+      if (accomplishmentMatches) {
+        accomplishmentMatches.forEach(m => accomplishments.add(m.trim()));
+      }
+      
+      // Extract recommendations
+      const recommendationMatches = conclusion.content.match(/(?:recommend|suggest|propose|should|would benefit)[^.]+\./gi);
+      if (recommendationMatches) {
+        recommendationMatches.forEach(m => recommendations.add(m.trim()));
+      }
+      
+      // Extract key insights
+      const insightMatches = conclusion.content.match(/(?:key|important|critical|essential|found that|discovered)[^.]+\./gi);
+      if (insightMatches) {
+        insightMatches.forEach(m => keyPoints.add(m.trim()));
+      }
+    }
+    
+    // Build comprehensive synthesis
+    let synthesis = `## Autonomous Conversation Synthesis\n\n`;
+    
+    if (accomplishments.size > 0) {
+      synthesis += `### Key Accomplishments:\n`;
+      Array.from(accomplishments).slice(0, 3).forEach(a => {
+        synthesis += `- ${a}\n`;
+      });
+      synthesis += `\n`;
+    }
+    
+    if (keyPoints.size > 0) {
+      synthesis += `### Critical Insights:\n`;
+      Array.from(keyPoints).slice(0, 4).forEach(p => {
+        synthesis += `- ${p}\n`;
+      });
+      synthesis += `\n`;
+    }
+    
+    if (recommendations.size > 0) {
+      synthesis += `### Recommendations:\n`;
+      Array.from(recommendations).slice(0, 3).forEach(r => {
+        synthesis += `- ${r}\n`;
+      });
+      synthesis += `\n`;
+    }
+    
+    // If we still have the best conclusion, add its main content
+    if (conclusions[0].content && conclusions[0].content.length > 100) {
+      synthesis += `### Detailed Analysis:\n${conclusions[0].content}\n\n`;
+    }
+    
+    synthesis += `---\n[This conclusion synthesized from ${conclusions.length} different AI models: ${conclusions.map(c => c.model).join(', ')}]`;
+    
+    return synthesis;
+  }
+  
+  async generateFallbackConclusion() {
+    // Generate conclusion from conversation memory when models fail
+    const memory = this.conversationMemory.slice(-20);
+    const agents = Array.from(this.activeAgents.values());
+    
+    let fallback = `## Conversation Summary\n\n`;
+    
+    fallback += `### Objective:\n${this.currentObjective?.mainObjective || 'Autonomous discussion and problem-solving'}\n\n`;
+    
+    fallback += `### Participants:\n`;
+    agents.forEach(agent => {
+      fallback += `- **${agent.type}** (${agent.assignedModel?.name || 'Unknown Model'}): ${agent.purpose || 'Specialized agent'}\n`;
+    });
+    fallback += `\n`;
+    
+    fallback += `### Key Discussion Points:\n`;
+    const keyMessages = memory.filter(m => m.content && m.content.length > 100);
+    keyMessages.slice(-5).forEach(msg => {
+      const preview = msg.content.substring(0, 200).replace(/\n/g, ' ');
+      fallback += `- ${preview}...\n`;
+    });
+    fallback += `\n`;
+    
+    fallback += `### Conversation Metrics:\n`;
+    fallback += `- Total iterations: ${this.currentIteration}\n`;
+    fallback += `- Agents created: ${agents.length}\n`;
+    fallback += `- Messages exchanged: ${memory.length}\n`;
+    fallback += `- Decisions made: ${this.conversationContext.decisions.length}\n\n`;
+    
+    fallback += `### Conclusion:\n`;
+    fallback += `The autonomous conversation explored ${this.currentObjective?.mainObjective || 'the given topic'} through ${this.currentIteration} iterations of multi-agent discussion. `;
+    fallback += `The system created ${agents.length} specialized agents who collaboratively analyzed the problem space. `;
+    
+    if (this.conversationContext.decisions.length > 0) {
+      fallback += `Key decisions included: ${this.conversationContext.decisions.slice(0, 3).join(', ')}. `;
+    }
+    
+    fallback += `The conversation demonstrated the system's ability to autonomously coordinate multiple AI agents for complex problem-solving.\n`;
+    
+    return fallback;
   }
 
   /**
