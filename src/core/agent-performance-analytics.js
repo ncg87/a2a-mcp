@@ -498,6 +498,36 @@ export class AgentPerformanceAnalytics extends EventEmitter {
   }
   
   /**
+   * Get system-level metrics
+   */
+  getSystemMetrics() {
+    const runtime = Date.now() - (this.startTime || Date.now());
+    const totalResponses = Array.from(this.agentMetrics.values())
+      .reduce((sum, agent) => sum + agent.totalResponses, 0);
+    const totalTokens = Array.from(this.agentMetrics.values())
+      .reduce((sum, agent) => sum + agent.totalTokens, 0);
+    const totalErrors = Array.from(this.agentMetrics.values())
+      .reduce((sum, agent) => sum + agent.errors, 0);
+    const avgResponseTime = totalResponses > 0 
+      ? Array.from(this.agentMetrics.values())
+          .reduce((sum, agent) => sum + agent.totalResponseTime, 0) / totalResponses
+      : 0;
+    
+    return {
+      runtime,
+      totalResponses,
+      totalTokens,
+      totalErrors,
+      totalAgents: this.agentMetrics.size,
+      totalModels: this.modelMetrics.size,
+      avgResponseTime,
+      errorRate: totalResponses > 0 ? (totalErrors / totalResponses) * 100 : 0,
+      throughput: runtime > 0 ? (totalResponses / (runtime / 1000)) : 0,
+      activeConversations: this.conversationMetrics.totalConversations
+    };
+  }
+  
+  /**
    * Generate markdown report
    */
   generateMarkdownReport(report) {

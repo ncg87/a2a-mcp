@@ -18,6 +18,7 @@ export class A2AProtocol extends EventEmitter {
     this.capabilities = new Set();
     this.trustNetwork = new Map();
     this.negotiations = new Map();
+    this.pendingResponses = new Map(); // Track messages awaiting responses
   }
 
   async initialize() {
@@ -51,7 +52,7 @@ export class A2AProtocol extends EventEmitter {
     await this.messageBus.publish(`a2a:${targetAgentId}`, JSON.stringify(message));
     
     if (message.requiresResponse) {
-      return this.waitForResponse(message.id, message.ttl);
+      return await this.waitForResponse(message);
     }
     
     return message.id;
@@ -237,6 +238,11 @@ export class A2AProtocol extends EventEmitter {
         return;
       }
 
+      // Check if this is a response to a pending message
+      if (parsedMessage.conversationId) {
+        this.handleResponse(parsedMessage);
+      }
+      
       // Update trust network
       this.updateTrustScore(parsedMessage.from, 'message_received');
 
@@ -302,6 +308,67 @@ export class A2AProtocol extends EventEmitter {
       }
     }
   }
+  
+  async handleCapabilityOffer(message) {
+    const { capability, available, terms } = message.payload;
+    
+    if (available) {
+      // Store offered capability for future use
+      this.emit('capability_offered', {
+        from: message.from,
+        capability,
+        terms
+      });
+      
+      // Update trust score for offering help
+      this.updateTrustScore(message.from, 'capability_offered');
+    }
+  }
+  
+  async handleTaskAcceptance(message) {
+    const { negotiationId, accepted, counterTerms } = message.payload;
+    const negotiation = this.negotiations.get(negotiationId);
+    
+    if (negotiation) {
+      negotiation.status = 'accepted';
+      negotiation.counterTerms = counterTerms;
+      
+      this.emit('task_accepted', {
+        negotiationId,
+        task: negotiation.task,
+        acceptedBy: message.from
+      });
+      
+      // Update trust score
+      this.updateTrustScore(message.from, 'task_accepted');
+    }
+  }
+  
+  async handleTaskRejection(message) {
+    const { negotiationId, reason } = message.payload;
+    const negotiation = this.negotiations.get(negotiationId);
+    
+    if (negotiation) {
+      negotiation.status = 'rejected';
+      negotiation.rejectionReason = reason;
+      
+      this.emit('task_rejected', {
+        negotiationId,
+        task: negotiation.task,
+        rejectedBy: message.from,
+        reason
+      });
+    }
+  }
+  
+  async handlePing(message) {
+    // Respond to ping with pong
+    await this.sendMessage(message.from, 'PONG', {
+      timestamp: Date.now(),
+      agentId: this.agentId,
+      capabilities: Array.from(this.capabilities)
+    });
+  }
 
   async handleTaskNegotiation(message) {
     const { negotiationId, task, proposedTerms } = message.payload;
@@ -357,6 +424,39 @@ export class A2AProtocol extends EventEmitter {
     }
   }
 
+  /**
+   * Wait for a response to a message
+   */
+  async waitForResponse(message) {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        this.pendingResponses.delete(message.id);
+        reject(new Error(`Response timeout for message ${message.id}`));
+      }, message.ttl);
+      
+      this.pendingResponses.set(message.id, {
+        resolve,
+        reject,
+        timeout,
+        originalMessage: message
+      });
+    });
+  }
+  
+  /**
+   * Handle response to a pending message
+   */
+  handleResponse(responseMessage) {
+    const inResponseTo = responseMessage.payload?.inResponseTo || responseMessage.conversationId;
+    const pending = this.pendingResponses.get(inResponseTo);
+    
+    if (pending) {
+      clearTimeout(pending.timeout);
+      this.pendingResponses.delete(inResponseTo);
+      pending.resolve(responseMessage);
+    }
+  }
+  
   // Trust and reputation management
   updateTrustScore(agentId, interaction) {
     const currentScore = this.trustNetwork.get(agentId) || { score: 0.5, interactions: 0 };
@@ -365,13 +465,18 @@ export class A2AProtocol extends EventEmitter {
       'message_received': 0.01,
       'task_completed': 0.1,
       'task_failed': -0.05,
+      'task_accepted': 0.03,
       'knowledge_verified': 0.05,
-      'knowledge_invalid': -0.1
+      'knowledge_invalid': -0.1,
+      'capability_offered': 0.02,
+      'collaboration_accepted': 0.04,
+      'help_provided': 0.06
     };
 
     currentScore.score += scoreAdjustments[interaction] || 0;
     currentScore.score = Math.max(0, Math.min(1, currentScore.score)); // Clamp between 0 and 1
     currentScore.interactions++;
+    currentScore.lastInteraction = Date.now();
 
     this.trustNetwork.set(agentId, currentScore);
   }
@@ -394,6 +499,146 @@ export class A2AProtocol extends EventEmitter {
       .map(([agentId]) => agentId);
   }
 
+  // Evaluation methods (implement actual logic based on agent capabilities)
+  async evaluateCapabilityRequest(capability, parameters) {
+    // Check if we can provide the requested capability
+    if (!this.capabilities.has(capability)) return false;
+    
+    // Check resource availability
+    const resourcesAvailable = await this.checkResourceAvailability();
+    if (!resourcesAvailable) return false;
+    
+    // Validate parameters
+    if (parameters && typeof parameters === 'object') {
+      // Implement parameter validation based on capability type
+      return true;
+    }
+    
+    return true;
+  }
+  
+  async evaluateTaskProposal(task, proposedTerms) {
+    // Check if task is within our capabilities
+    const canHandle = task.requiredCapabilities?.every(cap => this.capabilities.has(cap)) ?? true;
+    
+    if (!canHandle) {
+      return { accept: false, reason: 'Missing required capabilities' };
+    }
+    
+    // Check deadline feasibility
+    if (proposedTerms.deadline && proposedTerms.deadline < Date.now() + 60000) {
+      return { accept: false, reason: 'Deadline too short' };
+    }
+    
+    // Check current workload
+    const workload = await this.getCurrentWorkload();
+    if (workload > 0.8) {
+      return { accept: false, reason: 'Currently overloaded' };
+    }
+    
+    return { accept: true, counterTerms: null };
+  }
+  
+  async evaluateCollaboration(task, type, participants) {
+    // Check if we can collaborate on this task
+    const hasCapabilities = task.requiredCapabilities?.some(cap => this.capabilities.has(cap)) ?? true;
+    
+    if (!hasCapabilities) {
+      return { accept: false, reason: 'No relevant capabilities', role: null };
+    }
+    
+    // Suggest role based on capabilities
+    const suggestedRole = this.suggestCollaborationRole(task);
+    
+    return {
+      accept: true,
+      reason: null,
+      role: suggestedRole
+    };
+  }
+  
+  async evaluateHelpRequest(problem, urgency, requesterCapabilities) {
+    // Check if we have capabilities to help
+    const relevantCapability = Array.from(this.capabilities).find(cap => 
+      problem.toLowerCase().includes(cap.toLowerCase())
+    );
+    
+    if (!relevantCapability) {
+      return { canAssist: false };
+    }
+    
+    // Check availability based on urgency
+    const availability = urgency === 'urgent' ? 'immediate' : 'scheduled';
+    
+    return {
+      canAssist: true,
+      assistance: `Can help with ${relevantCapability}`,
+      capability: relevantCapability,
+      availability
+    };
+  }
+  
+  async processSharedKnowledge(knowledge, type, fromAgent, trustLevel) {
+    // Store knowledge with trust metadata
+    const knowledgeEntry = {
+      content: knowledge,
+      type,
+      source: fromAgent,
+      trustLevel,
+      timestamp: Date.now(),
+      verified: trustLevel === 'high'
+    };
+    
+    // Emit event for knowledge processing
+    this.emit('knowledge_received', knowledgeEntry);
+    
+    // Update trust based on knowledge quality
+    if (await this.verifyKnowledge(knowledge)) {
+      this.updateTrustScore(fromAgent, 'knowledge_verified');
+    }
+  }
+  
+  async verifyKnowledge(knowledge) {
+    // Implement knowledge verification logic
+    // For now, accept all knowledge from trusted sources
+    return true;
+  }
+  
+  getCapabilityTerms(capability) {
+    return {
+      availability: 'immediate',
+      cost: 'reciprocal',
+      qualityLevel: 'high',
+      maxConcurrent: 3
+    };
+  }
+  
+  suggestCollaborationRole(task) {
+    // Suggest role based on task type and capabilities
+    if (task.type === 'analysis' && this.capabilities.has('data_analysis')) {
+      return 'analyst';
+    }
+    if (task.type === 'development' && this.capabilities.has('code_generation')) {
+      return 'developer';
+    }
+    return 'contributor';
+  }
+  
+  async checkResourceAvailability() {
+    // Check CPU, memory, and other resources
+    // For now, return true
+    return true;
+  }
+  
+  async getCurrentWorkload() {
+    // Return current workload as percentage (0-1)
+    const activeNegotiations = this.negotiations.size;
+    const activeConversations = this.conversations.size;
+    
+    const workload = (activeNegotiations + activeConversations) / 10;
+    return Math.min(workload, 1);
+  }
+  
   // Message signing and verification (simplified)
   signMessage(payload) {
     // In production, use proper cryptographic signing

@@ -1,2 +1,23 @@
 .env
 .env
+# dependencies
+node_modules/
+dashboard/node_modules/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# logs
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+chat-logs/
+
+# builds
+dist/
+build/
+nul

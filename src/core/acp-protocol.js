@@ -348,13 +348,22 @@ export class ACPProtocol extends EventEmitter {
     
     if (canPerform.possible) {
       // Accept the request and create commitment
-      await this.accept(message.sender, message.id, {
-        estimatedCompletion: canPerform.estimatedTime,
-        conditions: canPerform.conditions
-      }, message.conversationId);
+      await this.accept(message.sender, message.id, canPerform.conditions, message.conversationId);
       
-      // Schedule action execution
-      this.scheduleAction(action, parameters, message.conversationId);
+      // Execute the action asynchronously
+      this.executeAction(action, parameters).then(result => {
+        // Inform sender of completion
+        this.inform(message.sender, {
+          actionCompleted: action,
+          result
+        }, message.conversationId);
+      }).catch(error => {
+        // Inform sender of failure
+        this.inform(message.sender, {
+          actionFailed: action,
+          error: error.message
+        }, message.conversationId);
+      });
     } else {
       // Reject the request with reason
       await this.reject(message.sender, message.id, canPerform.reason, message.conversationId);
@@ -493,6 +502,331 @@ export class ACPProtocol extends EventEmitter {
     const requiredFields = ['id', 'protocol', 'sender', 'receiver', 'performative', 'content'];
     return requiredFields.every(field => message.hasOwnProperty(field)) &&
            this.performatives.has(message.performative);
+  }
+
+  /**
+   * Initialize knowledge base with default beliefs and intentions
+   */
+  async initializeKnowledgeBase() {
+    // Set default beliefs
+    this.beliefs.set('agentType', { value: this.agentId, confidence: 1.0 });
+    this.beliefs.set('capabilities', { value: [], confidence: 0.8 });
+    
+    // Set default intentions
+    this.intentions.set('primary', { goal: 'serve', priority: 1 });
+    
+    logger.debug(`Knowledge base initialized for ${this.agentId}`);
+  }
+  
+  /**
+   * Track conversations for context management
+   */
+  trackConversation(message) {
+    const conversation = this.conversations.get(message.conversationId) || {
+      id: message.conversationId,
+      participants: new Set(),
+      messages: [],
+      startTime: Date.now(),
+      status: 'active'
+    };
+    
+    conversation.participants.add(message.sender);
+    conversation.participants.add(message.receiver);
+    conversation.messages.push(message.id);
+    conversation.lastActivity = Date.now();
+    
+    this.conversations.set(message.conversationId, conversation);
+  }
+  
+  /**
+   * Update conversation state
+   */
+  updateConversation(message) {
+    const conversation = this.conversations.get(message.conversationId);
+    if (conversation) {
+      conversation.lastActivity = Date.now();
+      conversation.messages.push(message.id);
+    }
+  }
+  
+  /**
+   * Validate ACP message structure
+   */
+  validateACPMessage(message) {
+    return !!(
+      message.protocol === 'ACP' &&
+      message.performative &&
+      this.performatives.has(message.performative) &&
+      message.sender &&
+      message.receiver &&
+      message.content
+    );
+  }
+  
+  /**
+   * Update beliefs based on received information
+   */
+  async updateBeliefs(data, source, strength = 0.5) {
+    const beliefKey = typeof data === 'object' ? JSON.stringify(data) : data;
+    const existingBelief = this.beliefs.get(beliefKey);
+    
+    if (existingBelief) {
+      // Update confidence based on corroboration
+      existingBelief.confidence = Math.min(1.0, existingBelief.confidence + strength * 0.1);
+      existingBelief.sources.add(source);
+    } else {
+      // Add new belief
+      this.beliefs.set(beliefKey, {
+        value: data,
+        confidence: strength,
+        sources: new Set([source]),
+        timestamp: Date.now()
+      });
+    }
+  }
+  
+  /**
+   * Create commitment for accepted proposals
+   */
+  createCommitment(proposalId, conditions) {
+    const commitmentId = uuidv4();
+    const commitment = {
+      id: commitmentId,
+      proposalId,
+      conditions,
+      status: 'active',
+      createdAt: Date.now(),
+      expiresAt: conditions.deadline || Date.now() + 3600000 // 1 hour default
+    };
+    
+    this.commitments.set(commitmentId, commitment);
+    return commitmentId;
+  }
+  
+  /**
+   * Wait for bids and select winner
+   */
+  async waitForBidsAndSelect(contractId, deadline) {
+    return new Promise((resolve) => {
+      const bids = [];
+      
+      const bidHandler = (bidMessage) => {
+        if (bidMessage.content.contractId === contractId) {
+          bids.push({
+            agentId: bidMessage.sender,
+            bid: bidMessage.content
+          });
+        }
+      };
+      
+      this.on('bid_received', bidHandler);
+      
+      setTimeout(() => {
+        this.off('bid_received', bidHandler);
+        
+        // Select best bid based on evaluation criteria
+        const winner = this.selectBestBid(bids);
+        resolve(winner);
+      }, deadline - Date.now());
+    });
+  }
+  
+  /**
+   * Select best bid from received bids
+   */
+  selectBestBid(bids) {
+    if (bids.length === 0) return null;
+    
+    // Simple selection: lowest cost with acceptable capability
+    return bids.reduce((best, current) => {
+      const currentScore = this.scoreBid(current.bid);
+      const bestScore = best ? this.scoreBid(best.bid) : -1;
+      return currentScore > bestScore ? current : best;
+    }, null);
+  }
+  
+  /**
+   * Score a bid based on multiple criteria
+   */
+  scoreBid(bid) {
+    let score = 0;
+    
+    // Cost factor (lower is better)
+    if (bid.cost) {
+      score += (10000 - bid.cost) / 10000;
+    }
+    
+    // Time factor (faster is better)
+    if (bid.estimatedTime) {
+      score += (86400000 - bid.estimatedTime) / 86400000; // 24 hours baseline
+    }
+    
+    // Quality factor
+    if (bid.qualityLevel) {
+      score += bid.qualityLevel;
+    }
+    
+    return score;
+  }
+  
+  /**
+   * Wait for consensus from participants
+   */
+  async waitForConsensus(consensusId, request) {
+    return new Promise((resolve) => {
+      const responses = new Map();
+      
+      const consensusHandler = (message) => {
+        if (message.content.consensusId === consensusId) {
+          responses.set(message.sender, message.content.vote);
+        }
+      };
+      
+      this.on('consensus_response', consensusHandler);
+      
+      setTimeout(() => {
+        this.off('consensus_response', consensusHandler);
+        
+        const result = this.evaluateConsensus(responses, request.consensusType);
+        resolve({
+          consensusId,
+          achieved: result.achieved,
+          votes: Object.fromEntries(responses),
+          result: result.decision
+        });
+      }, request.deadline - Date.now());
+    });
+  }
+  
+  /**
+   * Evaluate consensus based on voting type
+   */
+  evaluateConsensus(responses, consensusType) {
+    const votes = Array.from(responses.values());
+    const total = votes.length;
+    const approvals = votes.filter(v => v === 'approve').length;
+    
+    switch (consensusType) {
+      case 'unanimous':
+        return { achieved: approvals === total, decision: approvals === total ? 'approve' : 'reject' };
+      case 'majority':
+        return { achieved: approvals > total / 2, decision: approvals > total / 2 ? 'approve' : 'reject' };
+      case 'supermajority':
+        return { achieved: approvals >= total * 2 / 3, decision: approvals >= total * 2 / 3 ? 'approve' : 'reject' };
+      default:
+        return { achieved: false, decision: 'unknown' };
+    }
+  }
+  
+  /**
+   * Execute action (to be overridden by specific agents)
+   */
+  async executeAction(action, parameters) {
+    // Default implementation - emit for agent to handle
+    return new Promise((resolve, reject) => {
+      this.emit('execute_action', { action, parameters, resolve, reject });
+    });
+  }
+  
+  /**
+   * Handle various message types
+   */
+  async handleQuery(message) {
+    const { queryType, parameters, maxResults } = message.content;
+    
+    const results = await this.processQuery(queryType, parameters, maxResults);
+    
+    // Send results back to querier
+    await this.inform(message.sender, {
+      queryResponse: queryType,
+      results
+    }, message.conversationId);
+  }
+  
+  async handlePropose(message) {
+    const { proposalId, proposal, terms, conditions } = message.content;
+    
+    const evaluation = await this.evaluateProposal(proposal, terms, conditions);
+    
+    if (evaluation.acceptable) {
+      await this.accept(message.sender, proposalId, evaluation.counterConditions, message.conversationId);
+    } else {
+      await this.reject(message.sender, proposalId, evaluation.reason, message.conversationId);
+    }
+  }
+  
+  async handleAccept(message) {
+    const { proposalId, acceptedConditions, commitment } = message.content;
+    
+    this.emit('proposal_accepted', {
+      proposalId,
+      acceptedBy: message.sender,
+      conditions: acceptedConditions,
+      commitment
+    });
+  }
+  
+  async handleReject(message) {
+    const { proposalId, reason } = message.content;
+    
+    this.emit('proposal_rejected', {
+      proposalId,
+      rejectedBy: message.sender,
+      reason
+    });
+  }
+  
+  async handleCFP(message) {
+    const { cfpId, task, requirements, deadline } = message.content;
+    
+    const capability = await this.evaluateTaskCapability(task, requirements);
+    
+    if (capability.capable) {
+      // Submit bid
+      await this.submitBid(message.sender, cfpId, {
+        cost: capability.estimatedCost,
+        estimatedTime: capability.estimatedTime,
+        qualityLevel: capability.qualityLevel || 0.8
+      }, message.conversationId);
+    }
+  }
+  
+  async handleBid(message) {
+    this.emit('bid_received', message);
+  }
+  
+  async handleSubscribe(message) {
+    const { subscriptionId, informationType, conditions } = message.content;
+    
+    // Store subscription
+    this.emit('subscription_request', {
+      from: message.sender,
+      subscriptionId,
+      type: informationType,
+      conditions
+    });
+    
+    // Acknowledge subscription
+    await this.inform(message.sender, {
+      subscriptionAcknowledged: subscriptionId
+    }, message.conversationId);
+  }
+  
+  async handleConsensusRequest(message) {
+    const { consensusId, proposal } = message.content;
+    
+    // Evaluate proposal and vote
+    const vote = await this.evaluateProposalForConsensus(proposal);
+    
+    await this.sendACPMessage(message.sender, 'CONSENSUS_RESPONSE', {
+      consensusId,
+      vote: vote ? 'approve' : 'reject'
+    });
+  }
+  
+  async evaluateProposalForConsensus(proposal) {
+    // Default: approve if proposal aligns with intentions
+    return true;
   }
 
   getBeliefStrength(information) {

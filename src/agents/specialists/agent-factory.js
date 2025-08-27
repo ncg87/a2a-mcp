@@ -1,4 +1,5 @@
 import { BaseAgent } from '../../core/base-agent.js';
+import AgentRuntimeManager from './agent-runtime.js';
 import logger from '../../utils/logger.js';
 import fs from 'fs/promises';
 import path from 'path';
@@ -19,6 +20,34 @@ export class AgentFactoryAgent extends BaseAgent {
     });
     
     this.createdAgents = new Map();
+    
+    // Initialize runtime manager for actual agent execution
+    this.runtimeManager = new AgentRuntimeManager({
+      maxAgents: config.maxAgents || 10,
+      sandboxMode: true, // Always use sandboxed execution for security
+      agentDirectory: './generated-agents'
+    });
+  }
+  
+  async initialize() {
+    await super.initialize();
+    await this.runtimeManager.initialize();
+    
+    // Set up event handlers
+    this.runtimeManager.on('agent:ready', ({ agentId }) => {
+      logger.info(`Created agent ${agentId} is ready`);
+    });
+    
+    this.runtimeManager.on('agent:result', ({ agentId, taskId, result }) => {
+      logger.info(`Agent ${agentId} completed task ${taskId}`);
+      this.emit('agent:task-complete', { agentId, taskId, result });
+    });
+    
+    this.runtimeManager.on('agent:error', ({ agentId, error }) => {
+      logger.error(`Agent ${agentId} error:`, error);
+    });
+    
+    return true;
   }
 
   async processTask(task) {
@@ -491,29 +520,57 @@ export default ${className};`;
   async createAndDeployAgent(task) {
     logger.info('Creating and deploying agent in one operation');
     
-    // Step 1: Create the agent
-    const createResult = await this.createAgent(task);
-    
-    // Step 2: Deploy the agent
-    const deployResult = await this.deployAgent({
-      agentType: createResult.agentType,
-      agentPath: createResult.filePath,
-      agentConfig: task.agentConfig
-    });
-    
-    // Step 3: Connect MCP servers if specified
-    let mcpResult = null;
-    if (task.mcpServers && task.mcpServers.length > 0) {
-      mcpResult = await this.connectMCPServers(task);
+    try {
+      // Step 1: Create the agent
+      const createResult = await this.createAgent(task);
+      
+      // Step 2: Read the generated agent code from file
+      const agentCode = await fs.readFile(createResult.filePath, 'utf-8');
+      
+      // Step 3: Deploy the agent using runtime manager
+      const agentSpec = task.agentSpec || this.inferAgentSpec(task);
+      const agentId = await this.runtimeManager.deployAgent(
+        agentCode,
+        agentSpec
+      );
+      
+      // Store agent reference
+      this.createdAgents.set(agentId, {
+        ...createResult,
+        agentId,
+        status: 'running',
+        createdAt: Date.now()
+      });
+      
+      // Step 3: Connect MCP servers if specified
+      let mcpResult = null;
+      if (task.mcpServers && task.mcpServers.length > 0) {
+        mcpResult = await this.connectMCPServers(task);
+      }
+      
+      // Step 4: Send initial task if provided
+      if (task.initialTask) {
+        const taskId = await this.runtimeManager.sendTaskToAgent(agentId, task.initialTask);
+        logger.info(`Sent initial task ${taskId} to agent ${agentId}`);
+      }
+      
+      return {
+        type: 'agent-creation-and-deployment',
+        agentId,
+        creation: createResult,
+        deployment: {
+          status: 'success',
+          agentId,
+          message: `Agent ${agentId} is now running`
+        },
+        mcpConnections: mcpResult,
+        status: 'completed'
+      };
+      
+    } catch (error) {
+      logger.error('Failed to create and deploy agent:', error);
+      throw error;
     }
-    
-    return {
-      type: 'agent-creation-and-deployment',
-      creation: createResult,
-      deployment: deployResult,
-      mcpConnections: mcpResult,
-      status: 'completed'
-    };
   }
 
   async handleAgentFactoryTask(task) {

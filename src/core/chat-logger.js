@@ -19,6 +19,7 @@ export class ChatLogger {
     this.activeChatFile = null;
     this.currentSessionId = null;
     this.initialized = false;
+    this.messages = []; // Store messages in memory for quick access
   }
 
   async initialize() {
@@ -75,6 +76,15 @@ AGENT RESPONSES:
     }
 
     const timestamp = new Date().toISOString();
+    
+    // Store message in memory for quick access
+    this.storeMessage({
+      agentId,
+      agentType,
+      message,
+      metadata,
+      timestamp
+    });
     
     // Format MCP tools section if used
     let mcpToolsSection = '';
@@ -380,6 +390,81 @@ END OF CHAT LOG
    */
   getChatLogsDirectory() {
     return this.chatLogsDir;
+  }
+
+  /**
+   * Get list of available log files
+   */
+  async getAvailableLogs() {
+    if (!this.initialized) await this.initialize();
+    
+    try {
+      const files = await fs.readdir(this.chatLogsDir);
+      const logFiles = files.filter(f => f.endsWith('.txt'));
+      
+      // Get file stats for each log
+      const logsWithStats = await Promise.all(
+        logFiles.map(async (filename) => {
+          const filepath = path.join(this.chatLogsDir, filename);
+          const stats = await fs.stat(filepath);
+          return {
+            filename,
+            size: stats.size,
+            created: stats.birthtime,
+            modified: stats.mtime
+          };
+        })
+      );
+      
+      // Sort by creation date, newest first
+      return logsWithStats.sort((a, b) => b.created - a.created);
+    } catch (error) {
+      logger.error('Failed to get available logs:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get content of a specific log file
+   */
+  async getLogContent(filename) {
+    if (!this.initialized) await this.initialize();
+    
+    try {
+      // Validate filename to prevent path traversal
+      if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+        throw new Error('Invalid filename');
+      }
+      
+      const filepath = path.join(this.chatLogsDir, filename);
+      const content = await fs.readFile(filepath, 'utf-8');
+      return content;
+    } catch (error) {
+      logger.error(`Failed to read log file ${filename}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Get messages from current session
+   */
+  async getMessages() {
+    return this.messages;
+  }
+
+  /**
+   * Store message in memory
+   */
+  storeMessage(message) {
+    this.messages.push({
+      ...message,
+      timestamp: new Date()
+    });
+    
+    // Keep only last 1000 messages in memory
+    if (this.messages.length > 1000) {
+      this.messages = this.messages.slice(-1000);
+    }
   }
 }
 

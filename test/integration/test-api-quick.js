@@ -1,0 +1,1 @@
+import { APIServer } from './src/api/server.js'; const server = new APIServer({ port: 3099 }); server.start().then(() => { console.log('Server OK'); setTimeout(() => process.exit(0), 1000); }).catch(e => { console.error('Failed:', e.message); process.exit(1); });

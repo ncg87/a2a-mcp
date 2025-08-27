@@ -219,32 +219,10 @@ export class BaseAgent extends EventEmitter {
   }
 }
 
-// Mock MCP Client class (would be replaced with actual MCP implementation)
-class MCPClient {
-  constructor(config) {
-    this.config = config;
-    this.connected = false;
-  }
+// Import the real MCP client
+import RealMCPClient from './real-mcp-client.js';
 
-  async connect() {
-    // Mock connection logic
-    logger.debug(`Connecting to MCP server at ${this.config.endpoint}`);
-    this.connected = true;
-  }
-
-  async disconnect() {
-    this.connected = false;
-  }
-
-  async invokeTool(toolName, parameters) {
-    if (!this.connected) {
-      throw new Error('MCP client not connected');
-    }
-    
-    // Mock tool invocation
-    logger.debug(`Invoking MCP tool ${toolName} with parameters:`, parameters);
-    return { success: true, result: 'Mock result' };
-  }
-}
+// Use RealMCPClient as MCPClient
+const MCPClient = RealMCPClient;
 
 export { MCPClient };

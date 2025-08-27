@@ -238,6 +238,57 @@ This system embodies several key principles:
 - Secrets are managed through environment variables
 - Generated agent code includes security best practices
 
+## Documentation and Issue Tracking Guidelines
+
+### 🔧 **ALWAYS UPDATE SYSTEM_ISSUES.md**
+When working on this codebase, you MUST:
+
+1. **Before starting any work:**
+   - Check `SYSTEM_ISSUES.md` for known problems and priorities
+   - Add any new issues or concerns you discover to the appropriate section
+   - Update issue status when starting work on something
+
+2. **After completing work:**
+   - Mark resolved issues as ✅ Complete in `SYSTEM_ISSUES.md`
+   - Add details about what was fixed and how
+   - Update the overall system grade if significant improvements were made
+
+3. **When discovering problems:**
+   - Immediately add them to `SYSTEM_ISSUES.md` with appropriate severity
+   - Categorize by impact and priority
+   - Include suggested solutions when possible
+
+### 📚 **ALWAYS UPDATE SYSTEM_DOCUMENTATION.md**
+Every change, feature, or improvement must be documented:
+
+1. **File Structure Reference:**
+   - Add new files to the appropriate section
+   - Update line counts and purposes
+   - Mark files as Active, Archived, or Deprecated
+
+2. **Recent Changes Section:**
+   - Document what was changed and why
+   - Include performance impacts and benefits
+   - Add before/after metrics when available
+
+3. **API Endpoints:**
+   - Document any new or modified endpoints
+   - Include request/response examples
+   - Update authentication requirements
+
+4. **Development Guidelines:**
+   - Add new patterns or conventions
+   - Update file organization rules
+   - Include lessons learned from recent work
+
+### 🎯 **Development Workflow**
+1. **Read** `SYSTEM_DOCUMENTATION.md` to understand current state
+2. **Check** `SYSTEM_ISSUES.md` for known problems
+3. **Plan** your approach and architecture
+4. **Implement** with proper testing
+5. **Document** all changes in both files
+6. **Update** `CLAUDE.md` if adding new guidelines
+
 This system represents a significant advancement in AI architecture, demonstrating how artificial intelligence can autonomously expand its capabilities through dynamic component creation and external service integration.
 
 ## Press Play System - Ultimate Interface

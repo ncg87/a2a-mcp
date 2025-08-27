@@ -8,9 +8,22 @@
       "WebFetch(domain:docs.anthropic.com)",
       "Bash(npm test:*)",
       "Bash(npm install:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npx create-react-app:*)",
+      "Bash(curl:*)",
+      "Bash(npm start)",
+      "Bash(set NODE_OPTIONS=--max_old_space_size=4096)",
+      "Bash(find:*)",
+      "Bash(npx depcheck:*)",
+      "Bash(npx madge:*)",
+      "Bash(ren:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(sed:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "C:\\c\\Users\\Nicko\\vscodeprojects"
+    ]
   }
 }

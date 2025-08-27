@@ -517,6 +517,94 @@ export class ConversationStateManager extends EventEmitter {
   }
   
   /**
+   * Get state by conversation ID
+   */
+  async getState(conversationId) {
+    // Check memory first
+    for (const [id, state] of this.states.entries()) {
+      if (state.conversationId === conversationId) {
+        return state;
+      }
+    }
+    
+    // Try to load from disk
+    try {
+      const files = await fs.readdir(this.config.statePath);
+      for (const file of files) {
+        if (file.includes(conversationId)) {
+          const filepath = path.join(this.config.statePath, file);
+          const data = await fs.readFile(filepath, 'utf8');
+          return JSON.parse(data);
+        }
+      }
+    } catch (error) {
+      logger.error('Failed to get state:', error);
+    }
+    
+    return null;
+  }
+  
+  /**
+   * List all saved states
+   */
+  async listStates() {
+    const states = [];
+    
+    // Add in-memory states
+    for (const [id, state] of this.states.entries()) {
+      states.push({
+        id: state.id,
+        conversationId: state.conversationId || state.id,
+        objective: state.data?.objective,
+        created: state.created,
+        updated: state.updated,
+        inMemory: true
+      });
+    }
+    
+    // Add disk states
+    try {
+      const files = await fs.readdir(this.config.statePath);
+      for (const file of files) {
+        if (file.startsWith('state-') && file.endsWith('.json')) {
+          const filepath = path.join(this.config.statePath, file);
+          try {
+            const data = await fs.readFile(filepath, 'utf8');
+            const state = JSON.parse(data);
+            
+            // Skip if already in memory
+            if (!states.some(s => s.id === state.id)) {
+              states.push({
+                id: state.id,
+                conversationId: state.conversationId || state.id,
+                objective: state.data?.objective,
+                created: state.created,
+                updated: state.updated,
+                inMemory: false,
+                file
+              });
+            }
+          } catch (err) {
+            logger.warn(`Failed to read state file ${file}:`, err.message);
+          }
+        }
+      }
+    } catch (error) {
+      logger.error('Failed to list disk states:', error);
+    }
+    
+    return states.sort((a, b) => b.updated - a.updated);
+  }
+  
+  /**
+   * Get total number of conversations
+   */
+  async getTotalConversations() {
+    const states = await this.listStates();
+    return states.length;
+  }
+  
+  /**
    * Shutdown state manager
    */
   async shutdown() {

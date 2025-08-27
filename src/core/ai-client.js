@@ -7,6 +7,8 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import logger from '../utils/logger.js';
+import IntelligentCache from './intelligent-cache.js';
+import aiConfig from './ai-config.js';
 
 dotenv.config();
 
@@ -15,6 +17,14 @@ export class AIClient {
     this.clients = new Map();
     this.rateLimits = new Map();
     this.initialized = false;
+    this.simulationMode = false;
+    
+    // Initialize intelligent cache
+    this.cache = new IntelligentCache({
+      maxSize: 1000,
+      ttl: 3600000, // 1 hour
+      similarityThreshold: 0.85
+    });
   }
 
   async initialize() {
@@ -83,11 +93,28 @@ export class AIClient {
         logger.info('Hugging Face client configured');
       }
 
+      // Initialize AI config for fallback
+      await aiConfig.initialize();
+      
+      // If no providers configured, use simulation mode
+      if (this.clients.size === 0) {
+        logger.warn('No AI providers configured - enabling simulation mode');
+        this.simulationMode = true;
+        this.clients.set('simulation', {
+          apiKey: 'simulation',
+          endpoint: 'simulation',
+          provider: 'simulation'
+        });
+      }
+      
       this.initialized = true;
-      logger.info(`AI Client initialized with ${this.clients.size} providers`);
+      logger.info(`AI Client initialized with ${this.clients.size} providers (simulation: ${this.simulationMode})`);
     } catch (error) {
       logger.error('Failed to initialize AI Client:', error);
-      throw error;
+      // Don't throw - enable simulation mode instead
+      this.simulationMode = true;
+      this.initialized = true;
+      logger.warn('AI Client initialization failed - using simulation mode');
     }
   }
 
@@ -97,11 +124,28 @@ export class AIClient {
   async generateResponse(modelId, prompt, options = {}) {
     if (!this.initialized) await this.initialize();
 
+    // Check cache first (unless explicitly disabled)
+    if (options.useCache !== false) {
+      const cached = this.cache.get(prompt, { modelId, ...options });
+      if (cached) {
+        logger.info(`Cache hit for model ${modelId} (similarity: ${cached.similarity})`);
+        return cached.response;
+      }
+    }
+
+    // Handle simulation mode
+    if (this.simulationMode || modelId === 'simulation') {
+      const response = await aiConfig.simulateAIResponse(prompt, modelId);
+      return response.content;
+    }
+    
     const provider = this.getProviderFromModelId(modelId);
     const client = this.clients.get(provider);
 
     if (!client) {
-      throw new Error(`No client configured for provider: ${provider}`);
+      logger.warn(`No client configured for provider: ${provider}, using simulation`);
+      const response = await aiConfig.simulateAIResponse(prompt, modelId);
+      return response.content;
     }
     
     // Fix temperature for models that require specific values
@@ -110,22 +154,40 @@ export class AIClient {
     }
 
     try {
+      let response;
       switch (provider) {
         case 'openai':
-          return await this.callOpenAI(client, prompt, options);
+          response = await this.callOpenAI(client, prompt, options);
+          break;
         case 'anthropic':
-          return await this.callAnthropic(client, prompt, options);
+          response = await this.callAnthropic(client, prompt, options);
+          break;
         case 'google':
-          return await this.callGoogle(client, prompt, options);
+          response = await this.callGoogle(client, prompt, options);
+          break;
         case 'apillm':
-          return await this.callAPillm(client, prompt, options);
+          response = await this.callAPillm(client, prompt, options);
+          break;
         case 'deepseek':
-          return await this.callDeepSeek(client, prompt, options);
+          response = await this.callDeepSeek(client, prompt, options);
+          break;
         case 'huggingface':
-          return await this.callHuggingFace(client, prompt, options);
+          response = await this.callHuggingFace(client, prompt, options);
+          break;
         default:
           throw new Error(`Unsupported provider: ${provider}`);
       }
+      
+      // Cache the successful response
+      if (response && options.useCache !== false) {
+        this.cache.set(prompt, { modelId, ...options }, response, {
+          provider,
+          timestamp: Date.now()
+        });
+        logger.debug(`Cached response for ${modelId}`);
+      }
+      
+      return response;
     } catch (error) {
       logger.error(`AI API call failed for ${provider}:`, error.message);
       
@@ -703,6 +765,34 @@ Keep your response focused, technical, and around 2-3 sentences unless more deta
    */
   getAvailableProviders() {
     return Array.from(this.clients.keys());
+  }
+  
+  /**
+   * Get cache statistics
+   */
+  getCacheStats() {
+    return this.cache.getStats();
+  }
+  
+  /**
+   * Clear cache
+   */
+  clearCache() {
+    this.cache.clear();
+  }
+  
+  /**
+   * Export cache for persistence
+   */
+  exportCache() {
+    return this.cache.exportCache();
+  }
+  
+  /**
+   * Import cache from previous session
+   */
+  importCache(data) {
+    return this.cache.importCache(data);
   }
 
   /**

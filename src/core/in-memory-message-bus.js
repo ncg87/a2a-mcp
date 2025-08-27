@@ -12,6 +12,11 @@ export class InMemoryMessageBus extends EventEmitter {
     this.subscriptions = new Map();
     this.connected = false;
     this.messageStore = new Map(); // Store messages by channel
+    
+    // Add memory management configuration
+    this.maxMessagesPerChannel = config?.maxMessagesPerChannel || 1000;
+    this.messageTTL = config?.messageTTL || 3600000; // 1 hour default TTL
+    this.cleanupInterval = null;
   }
 
   async connect() {
@@ -20,6 +25,10 @@ export class InMemoryMessageBus extends EventEmitter {
       await new Promise(resolve => setTimeout(resolve, 100));
       
       this.connected = true;
+      
+      // Start cleanup interval
+      this.startCleanupInterval();
+      
       logger.info('In-Memory message bus connected successfully');
       this.emit('connected');
       
@@ -32,6 +41,13 @@ export class InMemoryMessageBus extends EventEmitter {
 
   async disconnect() {
     this.connected = false;
+    
+    // Stop cleanup interval
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+    }
+    
     this.subscriptions.clear();
     this.messageStore.clear();
     this.emit('disconnected');
@@ -69,14 +85,22 @@ export class InMemoryMessageBus extends EventEmitter {
       throw new Error('Message bus not connected');
     }
 
-    // Store the message
+    // Store the message with memory management
     if (!this.messageStore.has(channel)) {
       this.messageStore.set(channel, []);
     }
-    this.messageStore.get(channel).push({
+    
+    const channelMessages = this.messageStore.get(channel);
+    channelMessages.push({
       message,
       timestamp: Date.now()
     });
+    
+    // Limit messages per channel to prevent memory leak
+    if (channelMessages.length > this.maxMessagesPerChannel) {
+      // Remove oldest messages
+      channelMessages.splice(0, channelMessages.length - this.maxMessagesPerChannel);
+    }
 
     // Deliver to subscribers
     if (this.subscriptions.has(channel)) {
@@ -117,6 +141,47 @@ export class InMemoryMessageBus extends EventEmitter {
     return Array.from(this.subscriptions.keys());
   }
 
+  /**
+   * Start periodic cleanup of old messages
+   */
+  startCleanupInterval() {
+    // Clean up old messages every 5 minutes
+    this.cleanupInterval = setInterval(() => {
+      this.cleanupOldMessages();
+    }, 300000); // 5 minutes
+  }
+  
+  /**
+   * Remove messages older than TTL
+   */
+  cleanupOldMessages() {
+    const now = Date.now();
+    let totalCleaned = 0;
+    
+    this.messageStore.forEach((messages, channel) => {
+      const before = messages.length;
+      
+      // Filter out old messages
+      const filtered = messages.filter(msg => 
+        (now - msg.timestamp) < this.messageTTL
+      );
+      
+      if (filtered.length < before) {
+        this.messageStore.set(channel, filtered);
+        totalCleaned += (before - filtered.length);
+      }
+      
+      // Remove empty channels
+      if (filtered.length === 0) {
+        this.messageStore.delete(channel);
+      }
+    });
+    
+    if (totalCleaned > 0) {
+      logger.debug(`Cleaned up ${totalCleaned} old messages from message bus`);
+    }
+  }
+  
   getSubscriberCount(channel) {
     return this.subscriptions.has(channel) ? this.subscriptions.get(channel).size : 0;
   }

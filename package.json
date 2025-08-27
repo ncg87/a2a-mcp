@@ -6,9 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "press-play": "node src/press-play.js",
-    "play": "node src/working-press-play.js",
-    "auto": "node src/autonomous-press-play.js",
+    "play:unified": "node src/unified-press-play.js",
+    "play:legacy-warning": "echo 'Old play commands deprecated. Use npm run play:unified'",
     "start:coordinator": "node src/agents/coordinator.js",
     "start:coordinator-enhanced": "node src/agents/coordinator-enhanced.js",
     "start:code-agent": "node src/agents/specialists/code-agent.js",
@@ -25,52 +24,53 @@
     "demo": "node examples/meta-task-demo.js",
     "demo:create-agents": "node examples/create-agents-task.js",
     "test": "jest",
-    "test:verification": "node test-knowledge-verification.js",
-    "test:subagents": "node test-sub-agent-system.js",
-    "test:api": "node test-api-fixes.js",
+    "test:all": "node test/run-tests.js",
+    "test:unit": "jest",
+    "test:integration": "node test/run-tests.js",
+    "test:manual": "node test/run-tests.js",
     "lint": "eslint src/**/*.js",
-    "dev": "nodemon src/press-play.js",
-    "quick": "npm run press-play",
+    "dev": "nodemon src/unified-press-play.js",
+    "quick": "npm run play:unified",
     "research": "node start-continuous-research.js",
-    "research:24-7": "node start-continuous-research.js"
+    "research:24-7": "node start-continuous-research.js",
+    "api": "node src/api/server.js",
+    "api:dev": "nodemon src/api/server.js",
+    "play": "node src/unified-press-play.js",
+    "play:debug": "DEBUG=true node start-all.js"
   },
   "dependencies": {
     "axios": "^1.5.0",
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
     "commander": "^11.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "eventemitter3": "^5.0.1",
     "express": "^4.18.2",
+    "express-rate-limit": "^8.0.1",
+    "helmet": "^8.1.0",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^5.7.0",
-    "node-cron": "^3.0.2",
     "nodemailer": "^6.10.1",
-    "pg": "^8.11.3",
     "redis": "^4.6.8",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "uuid": "^9.0.1",
+    "validator": "^13.15.15",
     "winston": "^3.10.0",
     "ws": "^8.14.2"
   },
   "devDependencies": {
     "chai": "^4.5.0",
+    "chalk": "^5.6.0",
     "eslint": "^8.49.0",
     "jest": "^29.7.0",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "open": "^10.2.0",
+    "ora": "^8.2.0"
   },
   "jest": {
-    "preset": "es-modules",
-    "extensionsToTreatAsEsm": [
-      ".js"
-    ],
-    "globals": {
-      "ts-jest": {
-        "useESM": true
-      }
-    },
-    "moduleNameMapping": {
-      "^(\\.{1,2}/.*)\\.js$": "$1"
-    },
-    "transform": {}
+    "testEnvironment": "node"
   },
   "keywords": [
     "multi-agent",
@@ -84,7 +84,7 @@
     "press-play"
   ],
   "bin": {
-    "press-play": "./src/press-play.js",
+    "press-play": "./src/unified-press-play.js",
     "multi-agent": "./src/index.js"
   },
   "engines": {
